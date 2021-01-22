@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+//noinspection GroovyUnusedAssignment
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+compileJava.options.encoding 'UTF-8'
+
+group 'me.dkim19375'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compileOnly 'net.dv8tion:JDA:4.2.0_227'
+}
