@@ -28,9 +28,11 @@ public class EmbedManager {
         embedBuilder.setTitle(title, titleURL);
     }
 
-    public EmbedManager(final @Nullable String heading, final @Nullable String headingIcon, final @Nullable Color color, final @Nullable String cmd,
+    public EmbedManager(final @Nullable User user, final @Nullable Color color, final @Nullable String cmd,
                         final @Nullable String title) {
-        embedBuilder.setAuthor(heading, null, headingIcon);
+        if (user != null) {
+            embedBuilder.setAuthor(user.getName(), null, user.getAvatarUrl());
+        }
         embedBuilder.setTimestamp(Instant.now());
         embedBuilder.setColor(color);
         embedBuilder.setFooter(cmd);
