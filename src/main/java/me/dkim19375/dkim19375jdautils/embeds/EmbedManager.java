@@ -28,8 +28,8 @@ public class EmbedManager {
         embedBuilder.setTitle(title, titleURL);
     }
 
-    public EmbedManager(final @Nullable User user, final @Nullable Color color, final @Nullable String cmd,
-                        final @Nullable String title) {
+    public EmbedManager(final @Nullable String title, final @Nullable Color color, final @Nullable String cmd,
+                        final @Nullable User user) {
         if (user != null) {
             embedBuilder.setAuthor(user.getName(), null, user.getAvatarUrl());
         }
