@@ -27,9 +27,9 @@ public class EmbedUtils {
 
     public static MessageEmbed.Field getEmbedGroup(Map.Entry<String, Set<String>> group) {
         final String name = group.getKey();
-        String value = "```\n";
+        String value = "```\n- ";
         for (String string : group.getValue()) {
-            value = combineStrings(value, string + "\n");
+            value = combineStrings(value, string + "\n- ");
         }
         value = combineStrings(value, "```");
         return new MessageEmbed.Field(name, value, true);

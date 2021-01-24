@@ -31,7 +31,7 @@ public class EmbedManager {
     public EmbedManager(final @Nullable String title, final @Nullable Color color, final @Nullable String cmd,
                         final @Nullable User user) {
         if (user != null) {
-            embedBuilder.setAuthor(user.getName(), null, user.getAvatarUrl());
+            embedBuilder.setAuthor(user.getAsTag(), null, user.getAvatarUrl());
         }
         embedBuilder.setTimestamp(Instant.now());
         embedBuilder.setColor(color);
