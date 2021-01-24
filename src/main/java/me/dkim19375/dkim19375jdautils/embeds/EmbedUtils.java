@@ -11,9 +11,9 @@ public class EmbedUtils {
         Set<MessageEmbed.Field> fields = new HashSet<>();
         for (Map.Entry<String, Set<String>> group : set.entrySet()) {
             final String name = group.getKey();
-            String value = "```\n";
+            String value = "```\n- ";
             for (String string : group.getValue()) {
-                value = combineStrings(value, string + "\n");
+                value = combineStrings(value, string + "\n- ");
             }
             value = combineStrings(value, "```");
             fields.add(new MessageEmbed.Field(name, value, true));
