@@ -12,8 +12,14 @@ public class EmbedUtils {
         for (Map.Entry<String, Set<String>> group : set.entrySet()) {
             final String name = group.getKey();
             String value = "```\n- ";
+            int i = 1;
             for (String string : group.getValue()) {
-                value = combineStrings(value, string + "\n- ");
+                if (i == group.getValue().size()) {
+                    value = combineStrings(value, string);
+                } else {
+                    value = combineStrings(value, string + "\n- ");
+                }
+                i++;
             }
             value = combineStrings(value, "```");
             fields.add(new MessageEmbed.Field(name, value, true));
@@ -28,9 +34,16 @@ public class EmbedUtils {
     public static MessageEmbed.Field getEmbedGroup(Map.Entry<String, Set<String>> group) {
         final String name = group.getKey();
         String value = "```\n- ";
+        int i = 1;
         for (String string : group.getValue()) {
-            value = combineStrings(value, string + "\n- ");
+            if (i == group.getValue().size()) {
+                value = combineStrings(value, string);
+            } else {
+                value = combineStrings(value, string + "\n- ");
+            }
+            i++;
         }
+
         value = combineStrings(value, "```");
         return new MessageEmbed.Field(name, value, true);
     }
