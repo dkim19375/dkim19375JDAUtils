@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
 
 public class EmbedManager {
+    @NotNull
     private final EmbedBuilder embedBuilder = new EmbedBuilder();
 
     public EmbedManager(final @Nullable String heading, final @Nullable String headingIcon, final @Nullable Color color,
@@ -44,47 +45,51 @@ public class EmbedManager {
         return embedBuilder;
     }
 
-    public void setUser(final @NotNull User user) {
+    public void setUser(@Nullable final User user) {
+        if (user == null) {
+            embedBuilder.setAuthor(null);
+            return;
+        }
         embedBuilder.setAuthor(user.getName() + "#" + user.getDiscriminator());
     }
 
-    public void setTimeStamp(TemporalAccessor temporalAccessor) {
+    public void setTimeStamp(@Nullable final TemporalAccessor temporalAccessor) {
         embedBuilder.setTimestamp(temporalAccessor);
     }
 
-    public void setColor(Color color) {
+    public void setColor(@Nullable final Color color) {
         embedBuilder.setColor(color);
     }
 
-    public void setFooter(@Nullable String footer) {
+    public void setFooter(@Nullable final String footer) {
         embedBuilder.setFooter(footer);
     }
 
-    public void setFooter(@Nullable String footer, @Nullable String footerURL) {
+    public void setFooter(@Nullable final String footer, @Nullable final String footerURL) {
         embedBuilder.setFooter(footer, footerURL);
     }
 
-    public void setDescription(CharSequence description) {
+    public void setDescription(@Nullable final CharSequence description) {
         embedBuilder.setDescription(description);
     }
 
-    public void setImage(String imageUrl) {
+    public void setImage(@Nullable final String imageUrl) {
         embedBuilder.setImage(imageUrl);
     }
 
-    public void setThumbnail(String imageUrl) {
+    public void setThumbnail(@Nullable final String imageUrl) {
         embedBuilder.setThumbnail(imageUrl);
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@Nullable final String title) {
         embedBuilder.setTitle(title);
     }
 
-    public void setTitle(String title, String titleUrl) {
+    public void setTitle(@Nullable final String title, @Nullable final String titleUrl) {
         embedBuilder.setTitle(title, titleUrl);
     }
 
-    public void setEmbedBuilder(final @NotNull EmbedBuilder embedBuilder) {
+    public void setEmbedBuilder(@NotNull final EmbedBuilder embedBuilder) {
         this.embedBuilder.clear();
         final MessageEmbed messageEmbed = embedBuilder.build();
         this.embedBuilder.setDescription(messageEmbed.getDescription());
@@ -103,6 +108,6 @@ public class EmbedManager {
         if (messageEmbed.getImage() != null) {
             this.embedBuilder.setImage(messageEmbed.getImage().getUrl());
         }
-        this.embedBuilder.getFields().addAll(messageEmbed.getFields()); }
-
+        this.embedBuilder.getFields().addAll(messageEmbed.getFields());
+    }
 }

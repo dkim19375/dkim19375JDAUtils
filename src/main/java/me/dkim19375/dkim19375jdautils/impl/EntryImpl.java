@@ -6,7 +6,7 @@ public class EntryImpl<K, V> implements Map.Entry<K, V> {
     private final K key;
     private V value;
 
-    public EntryImpl(K key, V value) {
+    public EntryImpl(final K key, final V value) {
         this.key = key;
         this.value = value;
     }

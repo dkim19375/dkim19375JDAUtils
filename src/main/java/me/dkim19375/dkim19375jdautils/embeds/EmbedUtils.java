@@ -1,28 +1,16 @@
 package me.dkim19375.dkim19375jdautils.embeds;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class EmbedUtils {
-    public static Set<MessageEmbed.Field> getEmbedGroups(Map<String, Set<String>> set) {
-        Set<MessageEmbed.Field> fields = new HashSet<>();
-        for (Map.Entry<String, Set<String>> group : set.entrySet()) {
-            final String name = group.getKey();
-            String value = "```\n- ";
-            int i = 1;
-            for (String string : group.getValue()) {
-                if (i == group.getValue().size()) {
-                    value = combineStrings(value, string);
-                } else {
-                    value = combineStrings(value, string + "\n- ");
-                }
-                i++;
-            }
-            value = combineStrings(value, "```");
-            fields.add(new MessageEmbed.Field(name, value, true));
+    @NotNull
+    public static Set<MessageEmbed.@NotNull Field> getEmbedGroups(final @NotNull Map<@NotNull String, ? extends Collection<@NotNull String>> groups) {
+        final Set<MessageEmbed.Field> fields = new HashSet<>();
+        for (Map.Entry<String, ? extends Collection<String>> group : groups.entrySet()) {
+            fields.add(getEmbedGroup(group));
         }
         return fields;
     }
@@ -31,7 +19,8 @@ public class EmbedUtils {
         return first + second;
     }
 
-    public static MessageEmbed.Field getEmbedGroup(Map.Entry<String, Set<String>> group) {
+    @NotNull
+    public static MessageEmbed.Field getEmbedGroup(@NotNull final Map.Entry<@NotNull String, ? extends Collection<@NotNull String>> group) {
         final String name = group.getKey();
         String value = "```\n- ";
         int i = 1;
@@ -43,7 +32,6 @@ public class EmbedUtils {
             }
             i++;
         }
-
         value = combineStrings(value, "```");
         return new MessageEmbed.Field(name, value, true);
     }

@@ -1,13 +1,16 @@
 package me.dkim19375.dkim19375jdautils.files;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.util.Properties;
 
 public class PropertiesFile {
+    @NotNull
     private final String fileName;
     private Properties properties;
 
-    public PropertiesFile(String fileName) {
+    public PropertiesFile(@NotNull String fileName) {
         this.fileName = fileName;
     }
 
@@ -39,7 +42,7 @@ public class PropertiesFile {
         return createFile(false);
     }
 
-    public boolean loadFile(InputStream stream) {
+    public boolean loadFile(@NotNull InputStream stream) {
         try {
             properties.load(stream);
         } catch (IOException exception) {
@@ -71,6 +74,7 @@ public class PropertiesFile {
         return true;
     }
 
+    @NotNull
     public Properties getProperties() {
         return properties;
     }
