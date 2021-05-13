@@ -6,16 +6,19 @@ import me.dkim19375.dkim19375jdautils.command.CommandType
 import me.dkim19375.dkim19375jdautils.event.CustomListener
 import me.dkim19375.dkim19375jdautils.event.EventListener
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.JDABuilder
 import java.util.*
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 @API
 abstract class BotBase(
-    @API val jda: JDA,
     val name: String,
+    @API val token: String,
     val customListener: CustomListener = object : CustomListener() {}
 ) {
+    @API
+    lateinit var jda: JDA
     val commandTypes = setOf<CommandType>()
 
     @API
@@ -34,6 +37,10 @@ abstract class BotBase(
             return
         }
         started = true
+        println("Starting bot")
+        val builder = JDABuilder.createDefault(token)
+        val jda = builder.build()
+        this.jda = jda
         jda.addEventListener(EventListener(this))
         Runtime.getRuntime().addShutdownHook(thread(false) {
             if (jda.status != JDA.Status.SHUTDOWN && jda.status != JDA.Status.SHUTTING_DOWN) {

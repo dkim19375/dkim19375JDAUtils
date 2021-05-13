@@ -43,7 +43,7 @@ class HelpCommand(private val bot: BotBase) : Command(bot) {
             sendHelpUsage(cmd, event, command)
             return
         }
-        val embedManager = EmbedManager("UniG0 $name: ${type.displayname}", Color.BLUE, cmd, event.author)
+        val embedManager = EmbedManager("${bot.name} $name: ${type.displayname}", Color.BLUE, cmd, event.author)
         embedManager.embedBuilder.addField(
             "TIP:", "Do ${bot.getPrefix(event.guild.id)}help <command> " +
                     "to view information about a specific command!", false
