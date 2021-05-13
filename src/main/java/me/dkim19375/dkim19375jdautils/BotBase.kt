@@ -19,13 +19,13 @@ abstract class BotBase(
 ) {
     @API
     lateinit var jda: JDA
-    val commandTypes = setOf<CommandType>()
+    val commandTypes = mutableSetOf<CommandType>()
 
     @API
-    val commands = setOf<Command>()
+    val commands = mutableSetOf<Command>()
 
     @API
-    val consoleCommands = mapOf<String, (String) -> Unit>()
+    val consoleCommands = mutableMapOf<String, (String) -> Unit>()
     private var started = false
 
     fun getPrefix(guild: Long): String = getPrefix(guild.toString())
