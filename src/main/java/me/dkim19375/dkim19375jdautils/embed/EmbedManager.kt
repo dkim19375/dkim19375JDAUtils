@@ -1,113 +1,125 @@
-package me.dkim19375.dkim19375jdautils.embeds;
+package me.dkim19375.dkim19375jdautils.embed
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import me.dkim19375.dkim19375jdautils.annotation.API
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.User
+import java.awt.Color
+import java.time.Instant
+import java.time.temporal.TemporalAccessor
 
-import java.awt.*;
-import java.time.Instant;
-import java.time.temporal.TemporalAccessor;
+@API
+class EmbedManager {
+    @API
+    val embedBuilder = EmbedBuilder()
 
-public class EmbedManager {
-    @NotNull
-    private final EmbedBuilder embedBuilder = new EmbedBuilder();
-
-    public EmbedManager(final @Nullable String heading, final @Nullable String headingIcon, final @Nullable Color color,
-                        final @Nullable String cmd,
-                        final @Nullable String title, final @Nullable String titleURL,
-                        final @Nullable CharSequence description, final @Nullable String footerIconURL, final @Nullable String image,
-                        final @Nullable String thumbnail) {
-        embedBuilder.setAuthor(heading, null, headingIcon);
-        embedBuilder.setTimestamp(Instant.now());
-        embedBuilder.setColor(color);
-        embedBuilder.setFooter(cmd, footerIconURL);
-        embedBuilder.setDescription(description);
-        embedBuilder.setImage(image);
-        embedBuilder.setThumbnail(thumbnail);
-        embedBuilder.setTitle(title, titleURL);
+    @API
+    constructor(
+        heading: String? = null, headingIcon: String? = null, color: Color? = null,
+        cmd: String? = null,
+        title: String? = null, titleURL: String? = null,
+        description: CharSequence? = null, footerIconURL: String? = null, image: String? = null,
+        thumbnail: String? = null
+    ) {
+        embedBuilder.setAuthor(heading, null, headingIcon)
+        embedBuilder.setTimestamp(Instant.now())
+        embedBuilder.setColor(color)
+        embedBuilder.setFooter(cmd, footerIconURL)
+        embedBuilder.setDescription(description)
+        embedBuilder.setImage(image)
+        embedBuilder.setThumbnail(thumbnail)
+        embedBuilder.setTitle(title, titleURL)
     }
 
-    public EmbedManager(final @Nullable String title, final @Nullable Color color, final @Nullable String cmd,
-                        final @Nullable User user) {
+    @API
+    constructor(
+        title: String? = null, color: Color? = null, cmd: String? = null,
+        user: User? = null
+    ) {
         if (user != null) {
-            embedBuilder.setAuthor(user.getAsTag(), null, user.getAvatarUrl());
+            embedBuilder.setAuthor(user.asTag, null, user.avatarUrl)
         }
-        embedBuilder.setTimestamp(Instant.now());
-        embedBuilder.setColor(color);
-        embedBuilder.setFooter(cmd);
-        embedBuilder.setTitle(title);
+        embedBuilder.setTimestamp(Instant.now())
+        embedBuilder.setColor(color)
+        embedBuilder.setFooter(cmd)
+        embedBuilder.setTitle(title)
     }
 
-    @NotNull
-    public EmbedBuilder getEmbedBuilder() {
-        return embedBuilder;
-    }
-
-    public void setUser(@Nullable final User user) {
+    @API
+    fun setUser(user: User?) {
         if (user == null) {
-            embedBuilder.setAuthor(null);
-            return;
+            embedBuilder.setAuthor(null)
+            return
         }
-        embedBuilder.setAuthor(user.getName() + "#" + user.getDiscriminator());
+        embedBuilder.setAuthor(user.name + "#" + user.discriminator)
     }
 
-    public void setTimeStamp(@Nullable final TemporalAccessor temporalAccessor) {
-        embedBuilder.setTimestamp(temporalAccessor);
+    @API
+    fun setTimeStamp(temporalAccessor: TemporalAccessor?) {
+        embedBuilder.setTimestamp(temporalAccessor)
     }
 
-    public void setColor(@Nullable final Color color) {
-        embedBuilder.setColor(color);
+    @API
+    fun setColor(color: Color?) {
+        embedBuilder.setColor(color)
     }
 
-    public void setFooter(@Nullable final String footer) {
-        embedBuilder.setFooter(footer);
+    @API
+    fun setFooter(footer: String?) {
+        embedBuilder.setFooter(footer)
     }
 
-    public void setFooter(@Nullable final String footer, @Nullable final String footerURL) {
-        embedBuilder.setFooter(footer, footerURL);
+    @API
+    fun setFooter(footer: String?, footerURL: String?) {
+        embedBuilder.setFooter(footer, footerURL)
     }
 
-    public void setDescription(@Nullable final CharSequence description) {
-        embedBuilder.setDescription(description);
+    @API
+    fun setDescription(description: CharSequence?) {
+        embedBuilder.setDescription(description)
     }
 
-    public void setImage(@Nullable final String imageUrl) {
-        embedBuilder.setImage(imageUrl);
+    @API
+    fun setImage(imageUrl: String?) {
+        embedBuilder.setImage(imageUrl)
     }
 
-    public void setThumbnail(@Nullable final String imageUrl) {
-        embedBuilder.setThumbnail(imageUrl);
+    @API
+    fun setThumbnail(imageUrl: String?) {
+        embedBuilder.setThumbnail(imageUrl)
     }
 
-    public void setTitle(@Nullable final String title) {
-        embedBuilder.setTitle(title);
+    @API
+    fun setTitle(title: String?) {
+        embedBuilder.setTitle(title)
     }
 
-    public void setTitle(@Nullable final String title, @Nullable final String titleUrl) {
-        embedBuilder.setTitle(title, titleUrl);
+    @API
+    fun setTitle(title: String?, titleUrl: String?) {
+        embedBuilder.setTitle(title, titleUrl)
     }
 
-    public void setEmbedBuilder(@NotNull final EmbedBuilder embedBuilder) {
-        this.embedBuilder.clear();
-        final MessageEmbed messageEmbed = embedBuilder.build();
-        this.embedBuilder.setDescription(messageEmbed.getDescription());
-        this.embedBuilder.setTitle(messageEmbed.getTitle(), messageEmbed.getUrl());
-        this.embedBuilder.setTimestamp(messageEmbed.getTimestamp());
-        this.embedBuilder.setColor(messageEmbed.getColor());
-        if (messageEmbed.getThumbnail() != null) {
-            this.embedBuilder.setThumbnail(messageEmbed.getThumbnail().getUrl());
+    @API
+    fun setEmbedBuilder(embedBuilder: EmbedBuilder) {
+        this.embedBuilder.clear()
+        val messageEmbed = embedBuilder.build()
+        this.embedBuilder.setDescription(messageEmbed.description)
+        this.embedBuilder.setTitle(messageEmbed.title, messageEmbed.url)
+        this.embedBuilder.setTimestamp(messageEmbed.timestamp)
+        this.embedBuilder.setColor(messageEmbed.color)
+        if (messageEmbed.thumbnail != null) {
+            this.embedBuilder.setThumbnail(messageEmbed.thumbnail?.url)
         }
-        if (messageEmbed.getAuthor() != null) {
-            this.embedBuilder.setAuthor(messageEmbed.getAuthor().getName(), messageEmbed.getAuthor().getUrl(), messageEmbed.getAuthor().getIconUrl());
+        if (messageEmbed.author != null) {
+            this.embedBuilder.setAuthor(
+                messageEmbed.author?.name, messageEmbed.author?.url, messageEmbed.author?.iconUrl
+            )
         }
-        if (messageEmbed.getFooter() != null) {
-            this.embedBuilder.setFooter(messageEmbed.getFooter().getText(), messageEmbed.getFooter().getIconUrl());
+        if (messageEmbed.footer != null) {
+            this.embedBuilder.setFooter(messageEmbed.footer?.text, messageEmbed.footer?.iconUrl)
         }
-        if (messageEmbed.getImage() != null) {
-            this.embedBuilder.setImage(messageEmbed.getImage().getUrl());
+        if (messageEmbed.image != null) {
+            this.embedBuilder.setImage(messageEmbed.image?.url)
         }
-        this.embedBuilder.getFields().addAll(messageEmbed.getFields());
+        this.embedBuilder.fields.addAll(messageEmbed.fields)
     }
 }

@@ -1,38 +1,36 @@
-package me.dkim19375.dkim19375jdautils.embeds;
+package me.dkim19375.dkim19375jdautils.embed
 
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.jetbrains.annotations.NotNull;
+import me.dkim19375.dkim19375jdautils.annotation.API
+import net.dv8tion.jda.api.entities.MessageEmbed
 
-import java.util.*;
-
-public class EmbedUtils {
-    @NotNull
-    public static Set<MessageEmbed.@NotNull Field> getEmbedGroups(final @NotNull Map<@NotNull String, ? extends Collection<@NotNull String>> groups) {
-        final Set<MessageEmbed.Field> fields = new HashSet<>();
-        for (Map.Entry<String, ? extends Collection<String>> group : groups.entrySet()) {
-            fields.add(getEmbedGroup(group));
+@API
+object EmbedUtils {
+    @API
+    fun getEmbedGroups(groups: Map<String, Collection<String>>): Set<MessageEmbed.Field> {
+        val fields: MutableSet<MessageEmbed.Field> = mutableSetOf()
+        for (group in groups.entries) {
+            fields.add(getEmbedGroup(group.key, group.value))
         }
-        return fields;
+        return fields
     }
 
-    private static String combineStrings(String first, String second) {
-        return first + second;
+    private fun combineStrings(first: String, second: String): String {
+        return first + second
     }
 
-    @NotNull
-    public static MessageEmbed.Field getEmbedGroup(@NotNull final Map.Entry<@NotNull String, ? extends Collection<@NotNull String>> group) {
-        final String name = group.getKey();
-        String value = "```\n- ";
-        int i = 1;
-        for (String string : group.getValue()) {
-            if (i == group.getValue().size()) {
-                value = combineStrings(value, string);
+    @API
+    fun getEmbedGroup(name: String, values: Collection<String>): MessageEmbed.Field {
+        var value = "```\n- "
+        var i = 1
+        for (string in values) {
+            value = if (i == values.size) {
+                combineStrings(value, string)
             } else {
-                value = combineStrings(value, string + "\n- ");
+                combineStrings(value, "$string\n- ")
             }
-            i++;
+            i++
         }
-        value = combineStrings(value, "```");
-        return new MessageEmbed.Field(name, value, true);
+        value = combineStrings(value, "```")
+        return MessageEmbed.Field(name, value, true)
     }
 }
