@@ -9,16 +9,55 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent
 
+/**
+ * An abstract class to listen to detect if a command is valid to send
+ *
+ * For example, permission checking is done here
+ */
 abstract class CustomListener {
+    /**
+     * @property antiBot True if the commands should be user-only and not bots
+     */
     @API
     open val antiBot: Boolean = true
 
+    /**
+     * @param event The [MessageReceivedEvent] of this message
+     * @return true if the command should run, false if not
+     */
     @API
     open fun onMessageReceived(event: MessageReceivedEvent): Boolean = true
+
+    /**
+     * @param event The [GuildMessageReceivedEvent] of this message
+     * @return true if the command should run, false if not
+     */
     @API
     open fun onGuildMessageReceived(event: GuildMessageReceivedEvent): Boolean = true
+
+    /**
+     * @param event The [PrivateMessageReceivedEvent] of this message
+     * @return true if the command should run, false if not
+     */
     @API
     open fun onPrivateMessageReceived(event: PrivateMessageReceivedEvent): Boolean = true
+
+    /**
+     * **NOTE:** This will get called on [MessageReceivedEvent], which will also call [PrivateMessageReceivedEvent] *and*
+     * [GuildMessageReceivedEvent]!!
+     *
+     * @param command the [Command] that was sent
+     * @param cmd the exact [command/alias][String] that was sent
+     * @param args the [args][List] of the command
+     * @param member the [Member] who sent the command in [GuildMessageReceivedEvent], or **null** if the command was
+     * sent in [PrivateMessageReceivedEvent] or [MessageReceivedEvent]
+     * @param user the [User] who sent the command
+     * @param guild the [Guild] of where the command was sent
+     * @param message the [Message] that was sent
+     * @param channel the [MessageChannel] of where the command was sent
+     * @param event either [MessageReceivedEvent], [GuildMessageReceivedEvent], or [PrivateMessageReceivedEvent]
+     * @return true if the command should execute
+     */
     @API
     open fun isValid(
         command: Command,
@@ -38,11 +77,7 @@ abstract class CustomListener {
             return false
         }
         member?.let {
-            if (channel is GuildChannel) {
-                if (member.hasPermission(channel, command.permissions)) {
-                    return@let
-                }
-            } else if (member.hasPermission(command.permissions)) {
+            if (command.hasPermissions(user, member, (event as? GuildMessageReceivedEvent)?.channel)) {
                 return@let
             }
             if (event !is MessageReceivedEvent) {
@@ -65,31 +100,4 @@ abstract class CustomListener {
         }
         return true
     }
-    open fun isValid(
-        command: Command,
-        cmd: String,
-        args: List<String>,
-        event: GuildMessageReceivedEvent
-    ): Boolean =
-        isValid(command, cmd, args, event.member, event.author, event.guild, event.message, event.channel, event)
-
-    open fun isValid(
-        command: Command,
-        cmd: String,
-        args: List<String>,
-        event: MessageReceivedEvent
-    ): Boolean = isValid(
-        command, cmd, args, event.member, event.author, try {
-            event.guild
-        } catch (_: IllegalStateException) {
-            null
-        }, event.message, event.channel, event
-    )
-
-    open fun isValid(
-        command: Command,
-        cmd: String,
-        args: List<String>,
-        event: PrivateMessageReceivedEvent
-    ): Boolean = isValid(command, cmd, args, null, event.author, null, event.message, event.channel, event)
 }

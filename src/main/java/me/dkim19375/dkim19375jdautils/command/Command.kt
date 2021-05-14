@@ -14,6 +14,12 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent
 import java.awt.Color
 
+/**
+ * The [Command] class - should be extended in every command class
+ *
+ * @property bot The [BotBase] of this bot
+ * @constructor Creates a [Command] that should be in [BotBase.commands]
+ */
 @API
 abstract class Command(private val bot: BotBase) {
     abstract val command: String
@@ -26,7 +32,14 @@ abstract class Command(private val bot: BotBase) {
     open val permissions: Set<Permission> = setOf()
     open val whitelistUsers: Set<Long> = setOf()
 
-    fun sendHelpUsage(
+    /**
+     * Send help usage
+     *
+     * @param cmd The command of the sent message
+     * @param event either [PrivateMessageReceivedEvent], [GuildMessageReceivedEvent], or [MessageReceivedEvent]
+     * @param command the [Command] to set the help message for
+     */
+    open fun sendHelpUsage(
         cmd: String,
         event: Event,
         command: Command = this
@@ -66,8 +79,16 @@ abstract class Command(private val bot: BotBase) {
         channel.sendMessage(embedManager.embedBuilder.build()).queue()
     }
 
+    /**
+     * Checks if a user has permissions to run this [Command]
+     *
+     * @param user The [User] who sent the command
+     * @param member The [Member] who sent the command, null if not in a guild
+     * @param channel the [GuildChannel] of where the command was set, null if not in a guild
+     * @return True if the user has permissions, false if not
+     */
     @API
-    fun hasPermissions(user: User, member: Member? = null, channel: GuildChannel? = null): Boolean {
+    open fun hasPermissions(user: User, member: Member? = null, channel: GuildChannel? = null): Boolean {
         if (whitelistUsers.isNotEmpty() && !whitelistUsers.contains(user.idLong)) {
             return false
         }
@@ -78,12 +99,29 @@ abstract class Command(private val bot: BotBase) {
         return member.hasPermission(permissions)
     }
 
+    /**
+     * Called when a message was received
+     *
+     * Should not be used for general command handling
+     *
+     * @param message The message that the user sent
+     * @param event The [MessageReceivedEvent] of the sent message
+     */
     open fun onMessageReceived(
         message: String,
         event: MessageReceivedEvent
     ) {
     }
 
+    /**
+     * On command
+     *
+     * @param cmd The command/alias
+     * @param args The args, for example: **!help fun 2** would be **{ "fun", "2" }**
+     * @param prefix The prefix of the command sent
+     * @param all The entire raw command **excluding** the prefix
+     * @param event The [MessageReceivedEvent]
+     */
     open fun onCommand(
         cmd: String,
         args: List<String>,
@@ -93,12 +131,29 @@ abstract class Command(private val bot: BotBase) {
     ) {
     }
 
+    /**
+     * Called when a guild message was received
+     *
+     * Should not be used for general command handling
+     *
+     * @param message The message that the user sent
+     * @param event The [GuildMessageReceivedEvent] of the sent message
+     */
     open fun onGuildMessageReceived(
         message: String,
         event: GuildMessageReceivedEvent
     ) {
     }
 
+    /**
+     * On guild command
+     *
+     * @param cmd The command/alias
+     * @param args The args, for example: **!help fun 2** would be **{ "fun", "2" }**
+     * @param prefix The prefix of the command sent
+     * @param all The entire raw command **excluding** the prefix
+     * @param event The [GuildMessageReceivedEvent]
+     */
     open fun onGuildCommand(
         cmd: String,
         args: List<String>,
@@ -108,12 +163,29 @@ abstract class Command(private val bot: BotBase) {
     ) {
     }
 
+    /**
+     * Called when a private message was received
+     *
+     * Should not be used for general command handling
+     *
+     * @param message The message that the user sent
+     * @param event The [PrivateMessageReceivedEvent] of the sent message
+     */
     open fun onPrivateMessageReceived(
         message: String,
         event: PrivateMessageReceivedEvent
     ) {
     }
 
+    /**
+     * On private command
+     *
+     * @param cmd The command/alias
+     * @param args The args, for example: **!help fun 2** would be **{ "fun", "2" }**
+     * @param prefix The prefix of the command sent
+     * @param all The entire raw command **excluding** the prefix
+     * @param event The [PrivateMessageReceivedEvent]
+     */
     open fun onPrivateCommand(
         cmd: String,
         args: List<String>,

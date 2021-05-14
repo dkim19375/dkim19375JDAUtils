@@ -6,13 +6,22 @@ import me.dkim19375.dkim19375jdautils.embed.EmbedManager
 import me.dkim19375.dkim19375jdautils.embed.EmbedUtils
 import me.dkim19375.dkim19375jdautils.util.getCommand
 import me.dkim19375.dkim19375jdautils.util.getOfType
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 
 val OTHER_TYPE: CommandType = object : CommandType("OTHER", "Other") {}
 
+/**
+ * A default (optional) help command.
+ *
+ * In order to use it, you **must** register it in [BotBase.commands]!
+ *
+ * @property bot the [BotBase] of the bot
+ * @constructor Creates a help command
+ */
 @API
-class HelpCommand(private val bot: BotBase) : Command(bot) {
+open class HelpCommand(private val bot: BotBase) : Command(bot) {
     override val command = "help"
     override val name = "Help"
     override val aliases = setOf<String>()
@@ -28,6 +37,15 @@ class HelpCommand(private val bot: BotBase) : Command(bot) {
     override val type = OTHER_TYPE
     override val minArgs = 1
 
+    /**
+     * On help command
+     *
+     * @param cmd The command/alias
+     * @param args The args, for example: **!help fun 2** would be **{ "fun", "2" }**
+     * @param prefix The prefix of the command sent
+     * @param all The entire raw command **excluding** the prefix
+     * @param event The [GuildMessageReceivedEvent]
+     */
     override fun onGuildCommand(
         cmd: String,
         args: List<String>,

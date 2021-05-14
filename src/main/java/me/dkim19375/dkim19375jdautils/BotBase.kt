@@ -11,26 +11,41 @@ import java.util.*
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
+/**
+ * Bot base
+ *
+ * @constructor Create a bot base, should be the main class of your bot
+ */
 @API
-abstract class BotBase(
-    open val name: String,
-    open val token: String,
+abstract class BotBase {
+    abstract val name: String
+    abstract val token: String
     open val customListener: CustomListener = object : CustomListener() {}
-) {
+
     @API
     lateinit var jda: JDA
     val commandTypes = mutableSetOf<CommandType>()
-
     @API
     val commands = mutableSetOf<Command>()
-
     @API
     val consoleCommands = mutableMapOf<String, (String) -> Unit>()
     private var started = false
 
+    /**
+     * @param guild The guild to get the prefix of
+     * @return The prefix
+     */
     fun getPrefix(guild: Long): String = getPrefix(guild.toString())
+
+    /**
+     * @param guild The guild to get the prefix of
+     * @return The prefix
+     */
     abstract fun getPrefix(guild: String): String
 
+    /**
+     * @param stopCommandEnabled True if the stop console command should be enabled, false if not
+     */
     @API
     fun onStart(stopCommandEnabled: Boolean = true) {
         if (started) {
@@ -71,5 +86,10 @@ abstract class BotBase(
         }
     }
 
+    /**
+     * The method which is called them a command is being sent to all of the [Command]s in [commands]
+     *
+     * @param event the event of the command
+     */
     open fun sendEvent(event: (Command) -> Unit) = commands.forEach(event)
 }

@@ -15,4 +15,4 @@ fun String.getCommandType(bot: BotBase): CommandType? {
     return null
 }
 
-abstract class CommandType(val name: String, val displayname: String = StringUtils.capitalize(name.lowercase()))
+abstract class CommandType(open val name: String, open val displayname: String = StringUtils.capitalize(name.lowercase()))

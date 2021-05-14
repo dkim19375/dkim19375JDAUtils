@@ -10,6 +10,7 @@ compileJava.options.encoding 'UTF-8'
 group 'me.dkim19375'
 version '2.0.4'
 
+//noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions.jvmTarget = '1.8'
 
 repositories {

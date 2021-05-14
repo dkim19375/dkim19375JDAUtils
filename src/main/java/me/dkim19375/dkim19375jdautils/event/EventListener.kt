@@ -30,7 +30,7 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         }
         var command = message
         command = command.substring(prefix.length)
-        command = command.trim { it <= ' ' }
+        command = command.trim()
         val allArray = command.split(" ").toTypedArray()
         command = command.split(" ").toTypedArray()[0]
         val argsList = mutableListOf<String>()
@@ -138,20 +138,45 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         cmd: String,
         args: List<String>,
         event: GuildMessageReceivedEvent
-    ): Boolean = bot.customListener.isValid(command, cmd, args, event)
+    ): Boolean = bot.customListener.isValid(
+        command,
+        cmd,
+        args,
+        event.member,
+        event.author,
+        event.guild,
+        event.message,
+        event.channel,
+        event
+    )
 
     private fun isValid(
         command: Command,
         cmd: String,
         args: List<String>,
         event: MessageReceivedEvent
-    ): Boolean =
-        bot.customListener.isValid(command, cmd, args, event)
+    ): Boolean = bot.customListener.isValid(
+        command, cmd, args, event.member, event.author, try {
+            event.guild
+        } catch (_: IllegalStateException) {
+            null
+        }, event.message, event.channel, event
+    )
 
     private fun isValid(
         command: Command,
         cmd: String,
         args: List<String>,
         event: PrivateMessageReceivedEvent
-    ): Boolean = bot.customListener.isValid(command, cmd, args, event)
+    ): Boolean = bot.customListener.isValid(
+        command,
+        cmd,
+        args,
+        null,
+        event.author,
+        null,
+        event.message,
+        event.channel,
+        event
+    )
 }
