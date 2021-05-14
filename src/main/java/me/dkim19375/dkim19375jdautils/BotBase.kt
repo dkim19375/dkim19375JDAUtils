@@ -13,9 +13,9 @@ import kotlin.system.exitProcess
 
 @API
 abstract class BotBase(
-    val name: String,
-    @API val token: String,
-    val customListener: CustomListener = object : CustomListener() {}
+    open val name: String,
+    open val token: String,
+    open val customListener: CustomListener = object : CustomListener() {}
 ) {
     @API
     lateinit var jda: JDA
@@ -71,5 +71,5 @@ abstract class BotBase(
         }
     }
 
-    fun sendEvent(event: (Command) -> Unit) = commands.forEach(event)
+    open fun sendEvent(event: (Command) -> Unit) = commands.forEach(event)
 }

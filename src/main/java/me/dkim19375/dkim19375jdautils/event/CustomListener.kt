@@ -11,16 +11,16 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent
 
 abstract class CustomListener {
     @API
-    val antiBot: Boolean = true
+    open val antiBot: Boolean = true
 
     @API
-    fun onMessageReceived(event: MessageReceivedEvent): Boolean = true
+    open fun onMessageReceived(event: MessageReceivedEvent): Boolean = true
     @API
-    fun onGuildMessageReceived(event: GuildMessageReceivedEvent): Boolean = true
+    open fun onGuildMessageReceived(event: GuildMessageReceivedEvent): Boolean = true
     @API
-    fun onPrivateMessageReceived(event: PrivateMessageReceivedEvent): Boolean = true
+    open fun onPrivateMessageReceived(event: PrivateMessageReceivedEvent): Boolean = true
     @API
-    fun isValid(
+    open fun isValid(
         command: Command,
         cmd: String,
         args: List<String>,
@@ -65,7 +65,7 @@ abstract class CustomListener {
         }
         return true
     }
-    fun isValid(
+    open fun isValid(
         command: Command,
         cmd: String,
         args: List<String>,
@@ -73,7 +73,7 @@ abstract class CustomListener {
     ): Boolean =
         isValid(command, cmd, args, event.member, event.author, event.guild, event.message, event.channel, event)
 
-    fun isValid(
+    open fun isValid(
         command: Command,
         cmd: String,
         args: List<String>,
@@ -86,7 +86,7 @@ abstract class CustomListener {
         }, event.message, event.channel, event
     )
 
-    fun isValid(
+    open fun isValid(
         command: Command,
         cmd: String,
         args: List<String>,
