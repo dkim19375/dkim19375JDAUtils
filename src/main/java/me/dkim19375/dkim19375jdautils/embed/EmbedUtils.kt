@@ -15,11 +15,14 @@ object EmbedUtils {
     }
 
     private fun combineStrings(first: String, second: String): String {
-        return first + second
+        return "$first$second"
     }
 
     @API
     fun getEmbedGroup(name: String, values: Collection<String>): MessageEmbed.Field {
+        if (values.isEmpty()) {
+            return MessageEmbed.Field(name, "```\nNone ```", false)
+        }
         var value = "```\n- "
         var i = 1
         for (string in values) {
@@ -31,6 +34,6 @@ object EmbedUtils {
             i++
         }
         value = combineStrings(value, "```")
-        return MessageEmbed.Field(name, value, true)
+        return MessageEmbed.Field(name, value, false)
     }
 }

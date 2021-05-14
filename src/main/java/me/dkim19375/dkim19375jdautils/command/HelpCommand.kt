@@ -9,6 +9,8 @@ import me.dkim19375.dkim19375jdautils.util.getOfType
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 
+val OTHER_TYPE: CommandType = object : CommandType("OTHER", "Other") {}
+
 @API
 class HelpCommand(private val bot: BotBase) : Command(bot) {
     override val command = "help"
@@ -23,7 +25,7 @@ class HelpCommand(private val bot: BotBase) : Command(bot) {
                 "View commands in the ${type.displayname.lowercase()} category"
             )
         }.toSet()
-    override val type = object : CommandType("OTHER", "Other") {}
+    override val type = OTHER_TYPE
     override val minArgs = 1
 
     override fun onGuildCommand(
