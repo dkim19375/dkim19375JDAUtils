@@ -63,7 +63,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         reaction: MessageReaction.ReactionEmote? = null,
         debug: Boolean = false
     ) {
-        val actionVar: (Event) -> Future<Boolean> = actionLabel@{ event ->
+        @Suppress("DuplicatedCode") val actionVar: (Event) -> Future<Boolean> = actionLabel@{ event ->
             val future = CompletableFuture<Boolean>()
             if (debug) {
                 println("called ------------")
@@ -184,11 +184,11 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             }
             retrievedMessage.queue message@{ msg ->
                 jda.retrieveUserById(userId).queue userQ@{ user ->
-                    if (whitelist?.contains(userId) != false) {
+                    if (whitelist?.contains(userId) == false) {
+                        if (debug) {
+                            println("no whitelist")
+                        }
                         if (!removeIfNoPerms) {
-                            if (debug) {
-                                println("no whitelist")
-                            }
                             future.complete(false)
                             return@userQ
                         }
