@@ -98,10 +98,6 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             if (debug) {
                 println("passed userId test")
             }
-            val guild: Guild? = when (event) {
-                is GuildMessageReactionAddEvent -> event.guild
-                else -> null
-            }
             val emoji: MessageReaction.ReactionEmote = when (event) {
                 is GuildMessageReactionAddEvent -> event.reactionEmote
                 is MessageReactionAddEvent -> event.reactionEmote
@@ -126,6 +122,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             if (debug) {
                 println("passed channel test")
             }
+            val guild: Guild? = (channel as? GuildChannel)?.guild
             if (requiredChannel != 0L && requiredChannel != channel.idLong) {
                 if (debug) {
                     println("stopped - requiredChannel: $requiredChannel, channel: ${channel.idLong}")
@@ -182,30 +179,37 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             }
             retrievedMessage.queue message@{ msg ->
                 jda.retrieveUserById(userId).queue userQ@{ user ->
-                    guild?.retrieveMemberById(userId)?.queue memberQueue@{ member ->
+                    val removeNoPerms: (Member?) -> Boolean = removeNoPermsLabel@{ member ->
                         if (!whitelist.hasAccess(user, member, channel as? GuildChannel)) {
                             if (debug) {
                                 println("no permissions")
                             }
                             if (!removeIfNoPerms) {
                                 future.complete(false)
-                                return@memberQueue
+                                return@removeNoPermsLabel false
                             }
                             when {
                                 emoji.isEmoji -> msg.removeReaction(emoji.emoji, user).queue()
                                 emoji.isEmote -> msg.removeReaction(emoji.emote, user).queue()
                             }
                             future.complete(false)
+                            return@removeNoPermsLabel false
+                        }
+                        future.complete(true)
+                        action(event, guild, emoji, channel, user, msg, member)
+                        return@removeNoPermsLabel true
+                    }
+                    guild?.retrieveMemberById(userId)?.queue memberQueue@{ member ->
+                        if (!removeNoPerms(member)) {
                             return@memberQueue
                         }
                         if (debug) {
                             println("called action - guild")
                         }
-                        future.complete(true)
-                        action(event, guild, emoji, channel, user, msg, member)
                     } ?: let {
-                        future.complete(true)
-                        action(event, guild, emoji, channel, user, msg, null)
+                        if (!removeNoPerms(null)) {
+                            return@let
+                        }
                         if (debug) {
                             println("called action - null guild")
                         }
