@@ -64,7 +64,7 @@ abstract class BotBase {
         val jda = builder.build()
         this.jda = jda
         jda.addEventListener(EventListener(this))
-        jda.addEventListener(SpecialEventsManager(this))
+        jda.addEventListener(eventsManager)
         Runtime.getRuntime().addShutdownHook(thread(false) {
             if (jda.status != JDA.Status.SHUTDOWN && jda.status != JDA.Status.SHUTTING_DOWN) {
                 println("Stopping the bot!")
