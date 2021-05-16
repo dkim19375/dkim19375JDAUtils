@@ -2,11 +2,10 @@ package me.dkim19375.dkim19375jdautils.managers
 
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.annotation.API
+import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkim19375jdautils.util.EventType
 import me.dkim19375.dkim19375jdautils.util.getMessageId
 import me.dkim19375.dkim19375jdautils.util.getUserId
-import me.dkim19375.dkim19375jdautils.util.hasPermission
-import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent
@@ -57,8 +56,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         requiredMessage: Long = 0,
         requiredChannel: Long = 0,
         requiredGuild: Long = 0,
-        whitelist: Set<Long>? = null,
-        requiredPerms: Set<Permission> = emptySet(),
+        whitelist: Whitelist = Whitelist(bot.jda),
         removeIfNoPerms: Boolean = false,
         reaction: MessageReaction.ReactionEmote? = null,
         debug: Boolean = false
@@ -184,23 +182,8 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             }
             retrievedMessage.queue message@{ msg ->
                 jda.retrieveUserById(userId).queue userQ@{ user ->
-                    if (whitelist?.contains(userId) == false) {
-                        if (debug) {
-                            println("no whitelist")
-                        }
-                        if (!removeIfNoPerms) {
-                            future.complete(false)
-                            return@userQ
-                        }
-                        when {
-                            emoji.isEmoji -> msg.removeReaction(emoji.emoji, user).queue()
-                            emoji.isEmote -> msg.removeReaction(emoji.emote, user).queue()
-                        }
-                        future.complete(false)
-                        return@userQ
-                    }
                     guild?.retrieveMemberById(userId)?.queue memberQueue@{ member ->
-                        if (!member.hasPermission(requiredPerms, channel as? GuildChannel)) {
+                        if (!whitelist.hasAccess(user, member, channel as? GuildChannel)) {
                             if (debug) {
                                 println("no permissions")
                             }
