@@ -18,26 +18,42 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import kotlin.reflect.KClass
 
+/**
+ * Special events manager
+ *
+ * A manager to listen for specific events and create helpful methods to
+ * help listen to these events
+ *
+ * @property bot The [BotBase] of the bot
+ */
 open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     private val executor = Executors.newSingleThreadExecutor()
 
-    private val events = mutableListOf<(Event) -> Future<Boolean>>()
-    private val singleEvents = mutableMapOf<Type, MutableList<(Event) -> Future<Boolean>>>()
+    private val events = mutableListOf<(Event) -> Future<Pair<Boolean, Boolean>>>()
+    private val singleEvents = mutableMapOf<Type, MutableList<(Event) -> Future<Pair<Boolean, Boolean>>>>()
 
     override fun onGuildMessageReactionAdd(event: GuildMessageReactionAddEvent) = onEvent(Type.REACTION_ADD, event)
     override fun onPrivateMessageReactionAdd(event: PrivateMessageReactionAddEvent) = onEvent(Type.REACTION_ADD, event)
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) = onEvent(Type.REACTION_ADD, event)
 
     @Synchronized
-    private fun onEvent(@Suppress("SameParameterValue") type: Type, event: Event) {
-        events.forEach { it(event) }
+    protected open fun onEvent(@Suppress("SameParameterValue") type: Type, event: Event) {
+        events.toList().forEach { e ->
+            executor.submit {
+                val result = e(event).get()
+                if (result.second && result.first) {
+                    events.removeIf { it === e }
+                }
+            }
+        }
         for ((otherType, list) in singleEvents.toMap()) {
             if (otherType != type) {
                 continue
             }
             for (expression in list.toList()) {
                 executor.submit {
-                    if (expression(event).get()) {
+                    val result = expression(event).get()
+                    if (result.first) {
                         list.removeIf { it === expression }
                     }
                 }
@@ -48,36 +64,61 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         }
     }
 
+    /**
+     * Called when a user adds a reaction, based off of [MessageReactionAddEvent]
+     *
+     * @param permanent True if the event should be called permanently,
+     * false if should be no longer called again once called
+     * @param eventType The [EventType] of when this event should be called
+     * @param action The Action of what should happen on event.
+     *
+     * Returns **true** if the event should stop occurring, **false** if the event should keep occurring
+     * @param requiredMessage The required [Message] ID of the reacted message, 0 if it can apply to any message
+     * @param requiredChannel The required [Channel][MessageChannel] ID of the reacted message,
+     * 0 if it can apply to any channel
+     * @param requiredGuild The required [Guild] ID of the reacted message, 0 if it can apply to any guild
+     * @param whitelist The [Whitelist] for the user adding the reaction
+     * @param removeIfNoPerms True if the reaction should be removed if a [User] doesn't have permissions.
+     * **DOES NOT APPLY TO BOTS OR SELF**
+     * @param removeBotIfNoPerms True if the reaction should be removed it a [Bot][User] doesn't have permissions.
+     * **DOES NOT APPLY TO NON-BOTS**
+     * @param removeSelfIfNoPerms True if the reaction should be removed it this bot, [SelfUser] doesn't have permissions.
+     * **DOES NOT APPLY TO ANY USER BESIDES THIS**
+     * @param reaction The reaction that the event should only apply to, null if it can apply to any reaction
+     * @param debug True if it should print debug messages, false if not
+     */
     @API
-    fun onReactionAdd(
+    open fun onReactionAdd(
         permanent: Boolean,
         eventType: EventType,
-        action: (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?) -> Unit,
+        action: (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?) -> Boolean,
         requiredMessage: Long = 0,
         requiredChannel: Long = 0,
         requiredGuild: Long = 0,
         whitelist: Whitelist = Whitelist(bot.jda),
         removeIfNoPerms: Boolean = false,
+        removeBotIfNoPerms: Boolean = false,
+        removeSelfIfNoPerms: Boolean = false,
         reaction: MessageReaction.ReactionEmote? = null,
         debug: Boolean = false
     ) {
-        @Suppress("DuplicatedCode") val actionVar: (Event) -> Future<Boolean> = actionLabel@{ event ->
-            val future = CompletableFuture<Boolean>()
+        @Suppress("DuplicatedCode") val actionVar: (Event) -> Future<Pair<Boolean, Boolean>> = actionLabel@{ event ->
+            val future = CompletableFuture<Pair<Boolean, Boolean>>()
             if (debug) {
                 println("called ------------")
             }
             val jda = event.jda
             when (event) {
                 is GuildMessageReactionAddEvent -> if (eventType != EventType.GUILD) {
-                    future.complete(false)
+                    future.complete(Pair(first = false, second = false))
                     return@actionLabel future
                 }
                 is MessageReactionAddEvent -> if (eventType != EventType.GENERIC) {
-                    future.complete(false)
+                    future.complete(Pair(first = false, second = false))
                     return@actionLabel future
                 }
                 is PrivateMessageReactionAddEvent -> if (eventType != EventType.PRIVATE) {
-                    future.complete(false)
+                    future.complete(Pair(first = false, second = false))
                     return@actionLabel future
                 }
             }
@@ -85,14 +126,14 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                 println("passed EventType test")
             }
             val messageId: Long = event.getMessageId() ?: let {
-                future.complete(false)
+                future.complete(Pair(first = false, second = false))
                 return@actionLabel future
             }
             if (debug) {
                 println("passed messageId 1")
             }
             val userId: Long = event.getUserId() ?: let {
-                future.complete(false)
+                future.complete(Pair(first = false, second = false))
                 return@actionLabel future
             }
             if (debug) {
@@ -103,7 +144,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                 is MessageReactionAddEvent -> event.reactionEmote
                 is PrivateMessageReactionAddEvent -> event.reactionEmote
                 else -> {
-                    future.complete(false)
+                    future.complete(Pair(first = false, second = false))
                     return@actionLabel future
                 }
             }
@@ -115,7 +156,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                 is MessageReactionAddEvent -> event.channel
                 is PrivateMessageReactionAddEvent -> event.channel
                 else -> {
-                    future.complete(false)
+                    future.complete(Pair(first = false, second = false))
                     return@actionLabel future
                 }
             }
@@ -127,7 +168,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                 if (debug) {
                     println("stopped - requiredChannel: $requiredChannel, channel: ${channel.idLong}")
                 }
-                future.complete(false)
+                future.complete(Pair(first = false, second = false))
                 return@actionLabel future
             }
             if (debug) {
@@ -138,7 +179,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                     if (debug) {
                         println("stopped - reaction name: ${reaction.name}, emoji name: ${emoji.name}")
                     }
-                    future.complete(false)
+                    future.complete(Pair(first = false, second = false))
                     return@actionLabel future
                 }
             }
@@ -150,7 +191,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                 is MessageReactionAddEvent -> event.retrieveMessage()
                 is PrivateMessageReactionAddEvent -> event.channel.retrieveMessageById(event.messageIdLong)
                 else -> {
-                    future.complete(false)
+                    future.complete(Pair(first = false, second = false))
                     return@actionLabel future
                 }
             }
@@ -161,7 +202,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                 if (debug) {
                     println("stopped - requiredGuild: $requiredGuild, guild: ${guild.idLong}")
                 }
-                future.complete(false)
+                future.complete(Pair(first = false, second = false))
                 return@actionLabel future
             }
             if (debug) {
@@ -171,7 +212,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                 if (debug) {
                     println("stopped 2 - requiredMessage: $requiredMessage, messageId: $messageId")
                 }
-                future.complete(false)
+                future.complete(Pair(first = false, second = false))
                 return@actionLabel future
             }
             if (debug) {
@@ -180,24 +221,36 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             retrievedMessage.queue message@{ msg ->
                 jda.retrieveUserById(userId).queue userQ@{ user ->
                     val removeNoPerms: (Member?) -> Boolean = removeNoPermsLabel@{ member ->
-                        if (!whitelist.hasAccess(user, member, channel as? GuildChannel)) {
-                            if (debug) {
-                                println("no permissions")
-                            }
-                            if (!removeIfNoPerms) {
-                                future.complete(false)
-                                return@removeNoPermsLabel false
-                            }
-                            when {
-                                emoji.isEmoji -> msg.removeReaction(emoji.emoji, user).queue()
-                                emoji.isEmote -> msg.removeReaction(emoji.emote, user).queue()
-                            }
-                            future.complete(false)
+                        if (whitelist.hasAccess(user, member, channel as? GuildChannel)) {
+                            future.complete(
+                                Pair(
+                                    first = true,
+                                    second = action(event, guild, emoji, channel, user, msg, member)
+                                )
+                            )
+                            return@removeNoPermsLabel true
+                        }
+                        if (debug) {
+                            println("no permissions")
+                        }
+                        if (removeIfNoPerms && !user.isBot && user.idLong != jda.selfUser.idLong) {
+                            future.complete(Pair(first = false, second = false))
                             return@removeNoPermsLabel false
                         }
-                        future.complete(true)
-                        action(event, guild, emoji, channel, user, msg, member)
-                        return@removeNoPermsLabel true
+                        if (user.isBot && removeBotIfNoPerms) {
+                            future.complete(Pair(first = false, second = false))
+                            return@removeNoPermsLabel false
+                        }
+                        if (user.idLong == jda.selfUser.idLong && removeSelfIfNoPerms) {
+                            future.complete(Pair(first = false, second = false))
+                            return@removeNoPermsLabel false
+                        }
+                        when {
+                            emoji.isEmoji -> msg.removeReaction(emoji.emoji, user).queue()
+                            emoji.isEmote -> msg.removeReaction(emoji.emote, user).queue()
+                        }
+                        future.complete(Pair(first = false, second = false))
+                        return@removeNoPermsLabel false
                     }
                     guild?.retrieveMemberById(userId)?.queue memberQueue@{ member ->
                         if (!removeNoPerms(member)) {
@@ -229,7 +282,18 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         { mutableListOf() }.add(actionVar)
     }
 
+    /**
+     * Type
+     *
+     * @property classes
+     * @constructor Create empty Type
+     */
     enum class Type(@API val classes: Set<KClass<out Event>>) {
+        /**
+         * R e a c t i o n_a d d
+         *
+         * @constructor Create empty R e a c t i o n_a d d
+         */
         REACTION_ADD(
             setOf(
                 MessageReactionAddEvent::class,

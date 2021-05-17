@@ -8,7 +8,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.2.7'
+version '2.2.8'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -26,3 +26,12 @@ dependencies {
     api 'commons-io:commons-io:2.8.0'
     api 'org.apache.commons:commons-lang3:3.12.0'
 }
+
+task copyFileToBot(type: Copy) {
+    new File('../UniG0/libs/' + project.name + '-' + project.version + '-all.jar').delete()
+    from('build/libs/' + project.name + '-' + project.version + '-all.jar')
+    into('../UniG0/libs')
+    include('*.jar')
+}
+
+shadowJar.finalizedBy copyFileToBot
