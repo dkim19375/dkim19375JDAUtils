@@ -8,7 +8,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.2.8'
+version '2.2.9'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -28,7 +28,11 @@ dependencies {
 }
 
 task copyFileToBot(type: Copy) {
-    new File('../UniG0/libs/' + project.name + '-' + project.version + '-all.jar').delete()
+    for (File file : new File('../UniG0/libs').listFiles()) {
+        if (file.getName().startsWith("dkim19375JDAUtils")) {
+            file.delete()
+        }
+    }
     from('build/libs/' + project.name + '-' + project.version + '-all.jar')
     into('../UniG0/libs')
     include('*.jar')

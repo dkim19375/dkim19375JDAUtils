@@ -72,7 +72,8 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
      * @param eventType The [EventType] of when this event should be called
      * @param action The Action of what should happen on event.
      *
-     * Returns **true** if the event should stop occurring, **false** if the event should keep occurring
+     * Returns **true** if the event should keep occurring, **false** if the event should stop occurring.
+     * Does not matter if [permanent] is false
      * @param requiredMessage The required [Message] ID of the reacted message, 0 if it can apply to any message
      * @param requiredChannel The required [Channel][MessageChannel] ID of the reacted message,
      * 0 if it can apply to any channel
@@ -225,7 +226,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                             future.complete(
                                 Pair(
                                     first = true,
-                                    second = action(event, guild, emoji, channel, user, msg, member)
+                                    second = !action(event, guild, emoji, channel, user, msg, member)
                                 )
                             )
                             return@removeNoPermsLabel true
