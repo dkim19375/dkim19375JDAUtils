@@ -1,5 +1,6 @@
 package me.dkim19375.dkim19375jdautils
 
+import dev.minn.jda.ktx.injectKTX
 import me.dkim19375.dkim19375jdautils.annotation.API
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkim19375jdautils.command.HelpCommand
@@ -24,6 +25,7 @@ import kotlin.system.exitProcess
 abstract class BotBase {
     abstract val name: String
     abstract val token: String
+    open val injectKTS = false
     open val customListener: CustomListener = object : CustomListener() {}
     open val intents = mutableSetOf(GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGE_REACTIONS)
 
@@ -61,6 +63,9 @@ abstract class BotBase {
         started = true
         println("Starting bot")
         val builder = JDABuilder.createDefault(token)
+        if (injectKTS) {
+            builder.injectKTX()
+        }
         builder.enableIntents(intents)
         val jda = builder.build()
         this.jda = jda

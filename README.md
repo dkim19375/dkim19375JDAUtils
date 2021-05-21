@@ -10,6 +10,7 @@ THE API IS STILL VERY NEW, RESULTING IN FREQUENT CHANGES**
 work, please notify me!**
 
 ## Adding the dependency
+Gradle:
 ```groovy
 repositories {
     maven { url = 'https://jitpack.io' }
@@ -18,7 +19,19 @@ dependencies {
     implementation 'com.github.dkim19375:dkim19375JDAUtils:VERSION'
 }
 ```
-
+Maven:
+```xml
+<repository>
+    <id>jitpack</id>
+    <name>jitpack</name>
+    <url>https://jitpack.io/</url>
+</repository>
+<dependency>
+    <groupId>com.github.dkim19375</groupId>
+    <artifactId>dkim19375JDAUtils</artifactId>
+    <version>VERSION</version>
+</dependency>
+```
 ## Setting up the bot
 A class, that holds information such as the commands, needs to be 
 created. It extends `me.dkim19375.dkim19375JDAUtils.BotBase`.
