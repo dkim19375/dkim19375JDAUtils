@@ -3,9 +3,7 @@ package me.dkim19375.dkim19375jdautils.managers
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.annotation.API
 import me.dkim19375.dkim19375jdautils.data.Whitelist
-import me.dkim19375.dkim19375jdautils.util.EventType
-import me.dkim19375.dkim19375jdautils.util.getMessageId
-import me.dkim19375.dkim19375jdautils.util.getUserId
+import me.dkim19375.dkim19375jdautils.util.*
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent
@@ -13,6 +11,7 @@ import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEv
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.RestAction
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
@@ -29,20 +28,45 @@ import kotlin.reflect.KClass
 open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     private val executor = Executors.newSingleThreadExecutor()
 
-    private val events = mutableListOf<(Event) -> Future<Pair<Boolean, Boolean>>>()
-    private val singleEvents = mutableMapOf<Type, MutableList<(Event) -> Future<Pair<Boolean, Boolean>>>>()
+    @API
+    val events = mutableMapOf<UUID, (Event) -> Future<Pair<Boolean, Boolean>>>()
+
+    @API
+    val singleEvents = mutableMapOf<Type, MutableMap<UUID, (Event) -> Future<Pair<Boolean, Boolean>>>>()
 
     override fun onGuildMessageReactionAdd(event: GuildMessageReactionAddEvent) = onEvent(Type.REACTION_ADD, event)
     override fun onPrivateMessageReactionAdd(event: PrivateMessageReactionAddEvent) = onEvent(Type.REACTION_ADD, event)
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) = onEvent(Type.REACTION_ADD, event)
 
+    @API
+    fun getTask(uuid: UUID): ((Event) -> Future<Pair<Boolean, Boolean>>)? {
+        events[uuid]?.let {
+            return it
+        }
+        for (map in singleEvents.values) {
+            for ((newUUID, event) in map) {
+                if (newUUID == uuid) {
+                    return event
+                }
+            }
+        }
+        return null
+    }
+
+    @API
+    @Synchronized
+    fun removeTask(uuid: UUID) {
+        events.remove(uuid)
+        singleEvents.forEach { (_, map) -> map.remove(uuid) }
+    }
+
     @Synchronized
     protected open fun onEvent(@Suppress("SameParameterValue") type: Type, event: Event) {
         events.toList().forEach { e ->
             executor.submit {
-                val result = e(event).get()
+                val result = e.second(event).get()
                 if (result.second && result.first) {
-                    events.removeIf { it === e }
+                    events.removeIf { uuid, _ -> uuid == e.first }
                 }
             }
         }
@@ -52,13 +76,13 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             }
             for (expression in list.toList()) {
                 executor.submit {
-                    val result = expression(event).get()
+                    val result = expression.second(event).get()
                     if (result.first) {
-                        list.removeIf { it === expression }
+                        list.removeIf { uuid, _ -> uuid == expression.first }
                     }
                 }
             }
-            if (singleEvents.getOrDefault(otherType, mutableListOf()).isEmpty()) {
+            if (singleEvents.getOrDefault(otherType, mutableMapOf()).isEmpty()) {
                 singleEvents.remove(otherType)
             }
         }
@@ -92,7 +116,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     open fun onReactionAdd(
         permanent: Boolean,
         eventType: EventType,
-        action: (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?) -> Boolean,
+        action: (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?, UUID) -> Boolean,
         requiredMessage: Long = 0,
         requiredChannel: Long = 0,
         requiredGuild: Long = 0,
@@ -102,8 +126,10 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         removeSelfIfNoPerms: Boolean = false,
         reaction: MessageReaction.ReactionEmote? = null,
         debug: Boolean = false
-    ) {
-        @Suppress("DuplicatedCode") val actionVar: (Event) -> Future<Pair<Boolean, Boolean>> = actionLabel@{ event ->
+    ): UUID {
+        val combined = events.keys.plus(singleEvents.values.map { a -> a.keys }.combine())
+        val uuid = combined.getRandomUUID()
+        val actionVar: (Event) -> Future<Pair<Boolean, Boolean>> = actionLabel@{ event ->
             val future = CompletableFuture<Pair<Boolean, Boolean>>()
             if (debug) {
                 println("called ------------")
@@ -226,7 +252,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                             future.complete(
                                 Pair(
                                     first = true,
-                                    second = !action(event, guild, emoji, channel, user, msg, member)
+                                    second = !action(event, guild, emoji, channel, user, msg, member, uuid)
                                 )
                             )
                             return@removeNoPermsLabel true
@@ -276,11 +302,11 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             println("added to variables")
         }
         if (permanent) {
-            events.add(actionVar)
-            return
+            events[uuid] = actionVar
+            return uuid
         }
-        singleEvents.getOrPut(Type.REACTION_ADD)
-        { mutableListOf() }.add(actionVar)
+        singleEvents.getOrPut(Type.REACTION_ADD) { mutableMapOf() }[uuid] = actionVar
+        return uuid
     }
 
     /**

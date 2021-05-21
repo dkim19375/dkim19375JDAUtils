@@ -2,7 +2,8 @@ package me.dkim19375.dkim19375jdautils
 
 import me.dkim19375.dkim19375jdautils.annotation.API
 import me.dkim19375.dkim19375jdautils.command.Command
-import me.dkim19375.dkim19375jdautils.command.CommandType
+import me.dkim19375.dkim19375jdautils.command.HelpCommand
+import me.dkim19375.dkim19375jdautils.command.OTHER_TYPE
 import me.dkim19375.dkim19375jdautils.event.CustomListener
 import me.dkim19375.dkim19375jdautils.event.EventListener
 import me.dkim19375.dkim19375jdautils.managers.SpecialEventsManager
@@ -19,6 +20,7 @@ import kotlin.system.exitProcess
  * @constructor Create a bot base, should be the main class of your bot
  */
 @API
+@Suppress("LeakingThis")
 abstract class BotBase {
     abstract val name: String
     abstract val token: String
@@ -26,10 +28,9 @@ abstract class BotBase {
     open val intents = mutableSetOf(GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGE_REACTIONS)
 
     lateinit var jda: JDA
-    val commandTypes = mutableSetOf<CommandType>()
-    val commands = mutableSetOf<Command>()
+    val commandTypes = mutableSetOf(OTHER_TYPE)
+    val commands = mutableSetOf(HelpCommand(this))
 
-    @Suppress("LeakingThis")
     @API
     val eventsManager: SpecialEventsManager = SpecialEventsManager(this)
 
