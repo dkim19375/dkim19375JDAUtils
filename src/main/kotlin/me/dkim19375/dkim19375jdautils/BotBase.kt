@@ -8,6 +8,7 @@ import me.dkim19375.dkim19375jdautils.command.HelpCommand
 import me.dkim19375.dkim19375jdautils.command.OTHER_TYPE
 import me.dkim19375.dkim19375jdautils.event.CustomListener
 import me.dkim19375.dkim19375jdautils.event.EventListener
+import me.dkim19375.dkim19375jdautils.file.YamlFile
 import me.dkim19375.dkim19375jdautils.impl.CustomJDABuilder
 import me.dkim19375.dkim19375jdautils.managers.SpecialEventsManager
 import net.dv8tion.jda.api.JDA
@@ -81,6 +82,11 @@ abstract class BotBase {
      * [Commands][Command] that should be registered
      */
     open val commands = mutableSetOf<Command>(HelpCommand(this))
+
+    /**
+     * A [Set] of [YamlFiles][YamlFile] to register
+     */
+    open val files = mutableSetOf<YamlFile>()
 
     /**
      * An [Events Manager][SpecialEventsManager] useful for handling events such as reaction add listeners
@@ -166,6 +172,12 @@ abstract class BotBase {
             }
         }
     }
+
+    @API
+    open fun reloadFiles() = files.forEach(YamlFile::reload)
+
+    @API
+    open fun saveFiles() = files.forEach(YamlFile::save)
 
     /**
      * The method which is called them a command is being sent to all of the [Command]s in [commands]
