@@ -4,7 +4,7 @@ import me.dkim19375.dkim19375jdautils.BotBase
 import org.apache.commons.lang3.StringUtils
 
 fun String.getCommandType(bot: BotBase): CommandType? {
-    for (type in bot.commandTypes) {
+    for (type in bot.getAllCommandTypes()) {
         if (type.name.equals(this, ignoreCase = true)) {
             return type
         }

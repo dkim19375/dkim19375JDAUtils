@@ -6,7 +6,6 @@ import me.dkim19375.dkim19375jdautils.embed.EmbedManager
 import me.dkim19375.dkim19375jdautils.embed.EmbedUtils
 import me.dkim19375.dkim19375jdautils.util.getCommand
 import me.dkim19375.dkim19375jdautils.util.getOfType
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 
@@ -27,7 +26,7 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
     override val aliases = setOf<String>()
     override val description = "See the bot's commands"
     override val arguments: Set<CommandArg>
-        get() = bot.commandTypes.map { type ->
+        get() = bot.getAllCommandTypes().map { type ->
             CommandArg(
                 this,
                 type.displayname.lowercase(),
