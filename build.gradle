@@ -1,6 +1,10 @@
 plugins {
+    id 'signing'
+    id 'java-library'
+    id 'maven-publish'
+    id 'org.jetbrains.dokka' version '1.4.32'
+    id 'net.minecrell.licenser' version '0.4.1'
     id 'org.jetbrains.kotlin.jvm' version '1.5.0'
-    id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
 
 //noinspection GroovyUnusedAssignment
@@ -8,12 +12,17 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.5.0'
+version '2.5.1'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
     languageVersion = "1.5"
     jvmTarget = '1.8'
+}
+
+license {
+    header = rootProject.file("LICENSE")
+    include "**/*.kt"
 }
 
 repositories {
@@ -27,19 +36,76 @@ dependencies {
     compileOnly 'net.dv8tion:JDA:4.2.1_262'
     api 'commons-io:commons-io:2.8.0'
     api 'org.apache.commons:commons-lang3:3.12.0'
-    api 'com.github.minndevelopment:jda-ktx:+'
+    api 'com.github.minndevelopment:jda-ktx:0.4.0'
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
 }
 
-task copyFileToBot(type: Copy) {
-    for (File file : new File('../UniG0/libs').listFiles()) {
-        if (file.getName().startsWith("dkim19375JDAUtils")) {
-            file.delete()
-        }
-    }
-    from('build/libs/' + project.name + '-' + project.version + '-all.jar')
-    into('../UniG0/libs')
-    include('*.jar')
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+task javadocJar(type: Jar) {
+    from dokkaJavadoc
+    classifier 'javadoc'
 }
 
-shadowJar.finalizedBy copyFileToBot
+publishing {
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = releasesRepoUrl
+
+            credentials {
+                it.username mavenUsername
+                it.password mavenPassword
+            }
+        }
+    }
+
+    def project = project
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'io.github.dkim19375'
+            artifactId 'dkim19375jdautils'
+            version project.version
+
+            from components.kotlin
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                name = 'dkim19375JDAUtils'
+                description = 'A kotlin library used to help JDA developers make bots either!'
+                url = 'https://github.com/dkim19375/dkim19375JDAUtils'
+
+                packaging = 'jar'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'dkim19375'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git://github.com/dkim19375/dkim19375JDAUtils.git'
+                    developerConnection = 'scm:git:ssh://github.com:dkim19375/dkim19375JDAUtils.git'
+                    url = 'https://github.com/dkim19375/dkim19375JDAUtils'
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+tasks.jar.dependsOn licenseFormat

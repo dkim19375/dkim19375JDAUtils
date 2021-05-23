@@ -10,25 +10,22 @@ THE API IS STILL VERY NEW, RESULTING IN FREQUENT CHANGES**
 work, please notify me!**
 
 ## Adding the dependency
+Note: Before version `2.5.1`, `https://jitpack.io` was used instead of MavenCentral!
+
 Gradle:
 ```groovy
 repositories {
-    maven { url = 'https://jitpack.io' }
+    mavenCentral()
 }
 dependencies {
-    implementation 'com.github.dkim19375:dkim19375JDAUtils:VERSION'
+    implementation 'io.github.dkim19375:dkim19375jdautils:VERSION'
 }
 ```
 Maven:
 ```xml
-<repository>
-    <id>jitpack</id>
-    <name>jitpack</name>
-    <url>https://jitpack.io/</url>
-</repository>
 <dependency>
     <groupId>com.github.dkim19375</groupId>
-    <artifactId>dkim19375JDAUtils</artifactId>
+    <artifactId>dkim19375jdautils</artifactId>
     <version>VERSION</version>
 </dependency>
 ```
