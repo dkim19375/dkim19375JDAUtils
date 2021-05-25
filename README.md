@@ -15,7 +15,8 @@ Note: Before version `2.5.1`, `https://jitpack.io` was used instead of MavenCent
 Gradle:
 ```groovy
 repositories {
-    mavenCentral()
+    mavenCentral() // releases
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/' } // snapshots
 }
 dependencies {
     implementation 'io.github.dkim19375:dkim19375jdautils:VERSION'
