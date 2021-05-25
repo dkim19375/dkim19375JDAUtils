@@ -5,6 +5,7 @@ plugins {
     id 'org.jetbrains.dokka' version '1.4.32'
     id 'net.minecrell.licenser' version '0.4.1'
     id 'org.jetbrains.kotlin.jvm' version '1.5.0'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
 }
 
 //noinspection GroovyUnusedAssignment
@@ -12,7 +13,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.5.1'
+version '2.6.0-SNAPSHOT'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -51,7 +52,7 @@ task javadocJar(type: Jar) {
 
 publishing {
     repositories {
-        maven {
+/*        maven {
             def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             url = releasesRepoUrl
@@ -60,7 +61,7 @@ publishing {
                 it.username mavenUsername
                 it.password mavenPassword
             }
-        }
+        }*/
     }
 
     def project = project
@@ -100,6 +101,17 @@ publishing {
                     url = 'https://github.com/dkim19375/dkim19375JDAUtils'
                 }
             }
+        }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            username = mavenUsername
+            password = mavenPassword
         }
     }
 }
