@@ -147,12 +147,13 @@ publishing {
 }
 
 nexusPublishing {
+    packageGroup.set("io.github.dkim19375")
     repositories {
         sonatype {
             nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
             snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            username = mavenUsername
-            password = mavenPassword
+            username = project.findProperty("mavenUsername")
+            password = project.findProperty("mavenPassword")
         }
     }
 }
