@@ -22,15 +22,25 @@
  * SOFTWARE.
  */
 
-package me.dkim19375.dkim19375jdautils.impl
+package me.dkim19375.dkim19375jdautils.util
 
 import me.dkim19375.dkim19375jdautils.annotation.API
+import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createFile
+import kotlin.io.path.notExists
 
 @API
-data class EntryImpl<K, V>(override val key: K, override var value: V) : MutableMap.MutableEntry<K, V> {
-    override fun setValue(newValue: V): V {
-        val oldValue = this.value
-        this.value = newValue
-        return oldValue
+fun File.createFileAndDirs() = toPath().createFileAndDirs()
+
+fun Path.createFileAndDirs() {
+    if (!notExists()) {
+        return
+    }
+    parent?.createDirectories()
+    try {
+        createFile()
+    } catch (_: FileAlreadyExistsException) {
     }
 }

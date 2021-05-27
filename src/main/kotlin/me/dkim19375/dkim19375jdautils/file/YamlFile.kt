@@ -54,10 +54,7 @@ open class YamlFile(@API val properties: SettingsHolder, @API val fileName: Stri
         val rest = array.drop(1)
         val path = Paths.get(first, *rest.toTypedArray())
         this.path = path
-        if (path.notExists()) {
-            path.parent.createDirectories()
-            path.createFile()
-        }
+        
         manager = SettingsManager.from(file).configurationData(properties.javaClass).create()
     }
 

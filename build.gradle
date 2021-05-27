@@ -13,7 +13,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.6.0-SNAPSHOT'
+version '2.6.0'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -21,9 +21,18 @@ compileKotlin.kotlinOptions {
     jvmTarget = '1.8'
 }
 
+compileTestKotlin.kotlinOptions {
+    languageVersion = "1.5"
+    jvmTarget = '1.8'
+}
+
 license {
     header = rootProject.file("LICENSE")
     include "**/*.kt"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 repositories {
@@ -39,6 +48,22 @@ dependencies {
     api 'org.apache.commons:commons-lang3:3.12.0'
     api 'com.github.minndevelopment:jda-ktx:0.4.0'
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
+
+    testImplementation 'net.dv8tion:JDA:4.2.1_262'
+    testImplementation 'commons-io:commons-io:2.8.0'
+    testImplementation 'org.apache.commons:commons-lang3:3.12.0'
+    testImplementation 'com.github.minndevelopment:jda-ktx:0.4.0'
+    testImplementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
+
+    // testing libs
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    testImplementation 'org.powermock:powermock-core:2.0.9'
+    testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.9'
 }
 
 task sourcesJar(type: Jar) {
@@ -66,38 +91,54 @@ publishing {
 
     def project = project
     publications {
+        //noinspection GroovyAssignabilityCheck
         mavenJava(MavenPublication) {
+            //noinspection GroovyAssignabilityCheck
             groupId 'io.github.dkim19375'
+            //noinspection GroovyAssignabilityCheck
             artifactId 'dkim19375jdautils'
             version project.version
 
+            //noinspection GroovyAssignabilityCheck
             from components.kotlin
+            //noinspection GroovyAssignabilityCheck
             artifact sourcesJar
+            //noinspection GroovyAssignabilityCheck
             artifact javadocJar
 
             pom {
+                //noinspection GroovyAssignabilityCheck
                 name = 'dkim19375JDAUtils'
+                //noinspection GroovyAssignabilityCheck
                 description = 'A kotlin library used to help JDA developers make bots either!'
+                //noinspection GroovyAssignabilityCheck
                 url = 'https://github.com/dkim19375/dkim19375JDAUtils'
 
+                //noinspection GroovyAssignabilityCheck
                 packaging = 'jar'
 
                 licenses {
                     license {
+                        //noinspection GroovyAssignabilityCheck
                         name = 'MIT License'
+                        //noinspection GroovyAssignabilityCheck
                         url = 'https://opensource.org/licenses/MIT'
                     }
                 }
 
                 developers {
                     developer {
+                        //noinspection GroovyAssignabilityCheck
                         id = 'dkim19375'
                     }
                 }
 
                 scm {
+                    //noinspection GroovyAssignabilityCheck
                     connection = 'scm:git:git://github.com/dkim19375/dkim19375JDAUtils.git'
+                    //noinspection GroovyAssignabilityCheck
                     developerConnection = 'scm:git:ssh://github.com:dkim19375/dkim19375JDAUtils.git'
+                    //noinspection GroovyAssignabilityCheck
                     url = 'https://github.com/dkim19375/dkim19375JDAUtils'
                 }
             }
@@ -117,6 +158,10 @@ nexusPublishing {
 }
 
 signing {
+/*    def keyId = findProperty("signingKeyId")
+    def key = findProperty("signingKey")
+    def pass = findProperty("signingPassword")
+    useInMemoryPgpKeys(keyId, key, pass)*/
     sign publishing.publications.mavenJava
 }
 

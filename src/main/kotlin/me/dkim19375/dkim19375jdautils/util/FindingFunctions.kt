@@ -50,9 +50,8 @@ fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCache: Boo
     val userMention = USER_MENTION.matcher(query)
     val fullRefMatch = FULL_USER_REF.matcher(query)
     val manager = if (useShardManager) shardManager else null
-    val users = if (useCache) {
-        manager?.userCache?.asList() ?: userCache.asList()
-    } else {
+    val cache = manager?.userCache ?: userCache
+    val users = if (useCache) { cache.asList()} else {
         manager?.guilds
             ?.map(Guild::loadMembers)
             ?.map { it.get() }
@@ -413,7 +412,10 @@ fun JDA.findEmotes(query: String, useShardManager: Boolean = false, useCache: Bo
         guilds
             .map(Guild::retrieveEmotes)
             .map { it.complete() }
-            .map { it as Emote }
+            .combine()
+            .map {
+                it as Emote
+            }
     }).findEmotes(query)
 }
 

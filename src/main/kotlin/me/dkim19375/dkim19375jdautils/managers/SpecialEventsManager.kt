@@ -144,7 +144,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         requiredMessage: Long = 0,
         requiredChannel: Long = 0,
         requiredGuild: Long = 0,
-        whitelist: Whitelist = Whitelist(bot.jda),
+        whitelist: Whitelist = Whitelist(),
         removeIfNoPerms: Boolean = false,
         removeBotIfNoPerms: Boolean = false,
         removeSelfIfNoPerms: Boolean = false,

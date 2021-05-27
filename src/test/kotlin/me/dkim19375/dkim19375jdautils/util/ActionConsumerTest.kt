@@ -22,15 +22,39 @@
  * SOFTWARE.
  */
 
-package me.dkim19375.dkim19375jdautils.impl
+package me.dkim19375.dkim19375jdautils.util
 
-import me.dkim19375.dkim19375jdautils.annotation.API
+import kotlin.system.measureTimeMillis
+import kotlin.test.*
 
-@API
-data class EntryImpl<K, V>(override val key: K, override var value: V) : MutableMap.MutableEntry<K, V> {
-    override fun setValue(newValue: V): V {
-        val oldValue = this.value
-        this.value = newValue
-        return oldValue
+internal class ActionConsumerTest {
+    @Test
+    fun `Test time of queue`() {
+        val max = 100L
+        val time = measureTimeMillis {
+            ActionConsumer { Thread.sleep(300L) }.queue()
+        }
+        assertTrue(max > time)
+    }
+
+    @Test
+    fun `Test time of complete`() {
+        val max = 100L
+        val time = measureTimeMillis {
+            ActionConsumer { Thread.sleep(300L) }.complete()
+        }
+        assertTrue(max < time)
+    }
+
+    @Test
+    fun `Test time of submit`() {
+        val max = 100L
+        val time = measureTimeMillis {
+            ActionConsumer consumer@{
+                Thread.sleep(300L)
+                return@consumer true
+            }.submit().get()
+        }
+        assertTrue(max < time)
     }
 }

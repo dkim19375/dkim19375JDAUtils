@@ -25,20 +25,31 @@
 package me.dkim19375.dkim19375jdautils.data
 
 import me.dkim19375.dkim19375jdautils.util.hasPermission
-import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.GuildChannel
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
 
+/**
+ * Whitelist
+ *
+ * By default it applies to all users
+ *
+ * @property permissions Permissions required
+ * @property whitelist If it is not null, then the user's id must be in the [Set<Long>][Set]
+ * @property blacklist The user's id must not be in the [Set<Long>][Set]
+ * @property ignoreWhitelist Ignores whitelist rules
+ * @property ignoreWhitelistBots Makes bots ignore whitelist rules
+ * @property ignoreWhitelistSelf Makes self user ignore whitelist rules
+ * @constructor Creates an empty whitelist instance
+ */
 data class Whitelist(
-    val jda: JDA,
     val permissions: Set<Permission> = emptySet(),
     val whitelist: Set<Long>? = null,
     val blacklist: Set<Long> = emptySet(),
     val ignoreWhitelist: Set<Long> = emptySet(),
-    val ignoreWhitelistBots: Boolean = true,
-    val ignoreWhitelistSelf: Boolean = true
+    val ignoreWhitelistBots: Boolean = false,
+    val ignoreWhitelistSelf: Boolean = false
 ) {
     fun hasAccess(
         user: User,
@@ -51,17 +62,14 @@ data class Whitelist(
             }
         }
         if (
-            whitelist != null
-            && (!ignoreWhitelist.contains(user.idLong))
-            && (!(user.isBot && ignoreWhitelistBots))
-            && (user.idLong == jda.selfUser.idLong && !ignoreWhitelistSelf)
-            && (!whitelist.contains(user.idLong))
+            (whitelist != null) // checks if whitelist is not null
+            && (!ignoreWhitelist.contains(user.idLong)) // checks if the user is in the bypass whitelist
+            && (!(user.isBot && ignoreWhitelistBots)) // checks if the user is a bot and is in the bypass whitelist
+            && (!((user.idLong == user.jda.selfUser.idLong) && ignoreWhitelistSelf)) // checks if the user is self and is in the bypass whitelist
+            && (!whitelist.contains(user.idLong)) // checks if the user is not in the whitelist
         ) {
             return false
         }
-        if (blacklist.contains(user.idLong)) {
-            return false
-        }
-        return true
+        return !blacklist.contains(user.idLong)
     }
 }

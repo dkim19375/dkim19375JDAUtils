@@ -24,13 +24,33 @@
 
 package me.dkim19375.dkim19375jdautils.impl
 
-import me.dkim19375.dkim19375jdautils.annotation.API
+import kotlin.test.*
 
-@API
-data class EntryImpl<K, V>(override val key: K, override var value: V) : MutableMap.MutableEntry<K, V> {
-    override fun setValue(newValue: V): V {
-        val oldValue = this.value
-        this.value = newValue
-        return oldValue
+private const val FIRST_VALUE = "First Value"
+private const val SECOND_VALUE = "Second Value"
+private const val TEST_VALUE = "Test Value"
+
+internal class EntryImplTest {
+    @Test
+    fun `Test new instance values`() {
+        val entry = EntryImpl(FIRST_VALUE, SECOND_VALUE)
+        assertEquals(entry.key, FIRST_VALUE)
+        assertEquals(entry.value, SECOND_VALUE)
+        assertNotEquals(entry.key, SECOND_VALUE)
+        assertNotEquals(entry.value, FIRST_VALUE)
+    }
+
+    @Test
+    fun `Test return value of setValue`() {
+        val entry = EntryImpl(FIRST_VALUE, SECOND_VALUE)
+        assertEquals(entry.setValue(TEST_VALUE), SECOND_VALUE)
+    }
+
+    @Test
+    fun `Test setting value`() {
+        val entry = EntryImpl(FIRST_VALUE, SECOND_VALUE)
+        assertEquals(entry.value, SECOND_VALUE)
+        entry.setValue(TEST_VALUE)
+        assertEquals(entry.value, TEST_VALUE)
     }
 }
