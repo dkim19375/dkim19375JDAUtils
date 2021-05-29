@@ -24,6 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.event
 
+import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkim19375jdautils.data.MessageReceivedData
@@ -78,11 +79,15 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         if (!bot.customListener.onMessageReceived(event)) {
             return
         }
-        try {
-            bot.sendEvent { c -> c.onMessageReceived(event.message.contentRaw, event) }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            event.channel.sendMessage("An internal error has occurred!").queue()
+        bot.sendEvent { c ->
+            runBlocking {
+                try {
+                    c.onMessageReceived(event.message.contentRaw, event)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    event.channel.sendMessage("An internal error has occurred!").queue()
+                }
+            }
         }
         val msg = getMessage(
             event.message.contentRaw, try {
@@ -94,14 +99,16 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         )
         if (msg != null) {
             bot.sendEvent { c ->
-                if (!isValid(c, msg.command, msg.args.toList(), event)) {
-                    return@sendEvent
-                }
-                try {
-                    c.onCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    event.channel.sendMessage("An internal error has occurred!").queue()
+                runBlocking {
+                    if (!isValid(c, msg.command, msg.args.toList(), event)) {
+                        return@runBlocking
+                    }
+                    try {
+                        c.onCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        event.channel.sendMessage("An internal error has occurred!").queue()
+                    }
                 }
             }
         }
@@ -111,23 +118,30 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         if (!bot.customListener.onGuildMessageReceived(event)) {
             return
         }
-        try {
-            bot.sendEvent { c -> c.onGuildMessageReceived(event.message.contentRaw, event) }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            event.channel.sendMessage("An internal error has occurred!").queue()
+        bot.sendEvent { c ->
+            runBlocking {
+                try {
+                    c.onGuildMessageReceived(event.message.contentRaw, event)
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    event.channel.sendMessage("An internal error has occurred!").queue()
+                }
+            }
         }
         val msg = getMessage(event.message.contentRaw, event.guild.id, true)
         if (msg != null) {
             bot.sendEvent { c ->
-                if (!isValid(c, msg.command, msg.args.toList(), event)) {
-                    return@sendEvent
-                }
-                try {
-                    c.onGuildCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    event.channel.sendMessage("An internal error has occurred!").queue()
+                runBlocking {
+                    if (!isValid(c, msg.command, msg.args.toList(), event)) {
+                        return@runBlocking
+                    }
+                    try {
+                        c.onGuildCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        event.channel.sendMessage("An internal error has occurred!").queue()
+                    }
                 }
             }
         }
@@ -137,24 +151,30 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         if (!bot.customListener.onPrivateMessageReceived(event)) {
             return
         }
-        try {
-            bot.sendEvent { c -> c.onPrivateMessageReceived(event.message.contentRaw, event) }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            event.channel.sendMessage("An internal error has occurred!").queue()
+        bot.sendEvent { c ->
+            runBlocking {
+                try {
+                    c.onPrivateMessageReceived(event.message.contentRaw, event)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    event.channel.sendMessage("An internal error has occurred!").queue()
+                }
+            }
         }
         val msg = getMessage(event.message.contentRaw, null, false)
         if (msg != null) {
             try {
                 bot.sendEvent { c ->
-                    if (!isValid(c, msg.command, msg.args.toList(), event)) {
-                        return@sendEvent
-                    }
-                    try {
-                        c.onPrivateCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        event.channel.sendMessage("An internal error has occurred!").queue()
+                    runBlocking {
+                        if (!isValid(c, msg.command, msg.args.toList(), event)) {
+                            return@runBlocking
+                        }
+                        try {
+                            c.onPrivateCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            event.channel.sendMessage("An internal error has occurred!").queue()
+                        }
                     }
                 }
             } catch (e: Exception) {

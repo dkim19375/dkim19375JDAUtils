@@ -120,7 +120,7 @@ abstract class Command(private val bot: BotBase) {
      * @param message The message that the user sent
      * @param event The [MessageReceivedEvent] of the sent message
      */
-    open fun onMessageReceived(
+    open suspend fun onMessageReceived(
         message: String,
         event: MessageReceivedEvent
     ) {
@@ -135,7 +135,7 @@ abstract class Command(private val bot: BotBase) {
      * @param all The entire raw command **excluding** the prefix
      * @param event The [MessageReceivedEvent]
      */
-    open fun onCommand(
+    open suspend fun onCommand(
         cmd: String,
         args: List<String>,
         prefix: String,
@@ -152,7 +152,7 @@ abstract class Command(private val bot: BotBase) {
      * @param message The message that the user sent
      * @param event The [GuildMessageReceivedEvent] of the sent message
      */
-    open fun onGuildMessageReceived(
+    open suspend fun onGuildMessageReceived(
         message: String,
         event: GuildMessageReceivedEvent
     ) {
@@ -167,7 +167,7 @@ abstract class Command(private val bot: BotBase) {
      * @param all The entire raw command **excluding** the prefix
      * @param event The [GuildMessageReceivedEvent]
      */
-    open fun onGuildCommand(
+    open suspend fun onGuildCommand(
         cmd: String,
         args: List<String>,
         prefix: String,
@@ -184,7 +184,7 @@ abstract class Command(private val bot: BotBase) {
      * @param message The message that the user sent
      * @param event The [PrivateMessageReceivedEvent] of the sent message
      */
-    open fun onPrivateMessageReceived(
+    open suspend fun onPrivateMessageReceived(
         message: String,
         event: PrivateMessageReceivedEvent
     ) {
@@ -199,7 +199,7 @@ abstract class Command(private val bot: BotBase) {
      * @param all The entire raw command **excluding** the prefix
      * @param event The [PrivateMessageReceivedEvent]
      */
-    open fun onPrivateCommand(
+    open suspend fun onPrivateCommand(
         cmd: String,
         args: List<String>,
         prefix: String,

@@ -90,7 +90,7 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
      * @param all The entire raw command **excluding** the prefix
      * @param event The [GuildMessageReceivedEvent]
      */
-    override fun onCommand(
+    override suspend fun onCommand(
         cmd: String,
         args: List<String>,
         prefix: String,
