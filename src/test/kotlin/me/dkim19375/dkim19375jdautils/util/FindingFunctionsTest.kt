@@ -29,77 +29,74 @@ import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.requests.RestAction
 import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView
 import net.dv8tion.jda.api.utils.concurrent.Task
-import org.junit.runner.RunWith
-import org.powermock.api.mockito.PowerMockito.*
-import org.powermock.core.classloader.annotations.*
-import org.powermock.modules.junit4.PowerMockRunner
+import org.mockito.kotlin.*
 import kotlin.test.*
 
 private const val DUMMY = "dummy value"
 
 @Suppress("UNCHECKED_CAST")
-@RunWith(PowerMockRunner::class)
-@PrepareForTest(SnowflakeCacheView::class, JDA::class)
+// @RunWith(PowerMockRunner::class)
+// @PrepareForTest(SnowflakeCacheView::class, JDA::class)
 internal class FindingFunctionsTest {
 
     // --------------- CACHED EMPTY ---------------
 
     @Test
     fun `Test empty user functions cached`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<User> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<User>
-
-        `when`(snowflakeCacheView.asList()).thenReturn(emptyList<User>())
-        `when`(jda.userCache).thenReturn(snowflakeCacheView)
+        val snowflakeCacheView = mock<SnowflakeCacheView<User>> {
+            on { asList() }.thenReturn(emptyList<User>())            
+        }
+        val jda = mock<JDA> {
+            on { userCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertTrue(jda.findUsers(DUMMY).isEmpty())
     }
 
     @Test
     fun `Test empty emotes functions cached`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<Emote> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<Emote>
-
-        `when`(snowflakeCacheView.asList()).thenReturn(emptyList<Emote>())
-        `when`(jda.emoteCache).thenReturn(snowflakeCacheView)
+        val snowflakeCacheView = mock<SnowflakeCacheView<Emote>> {
+            on { asList() }.thenReturn(emptyList<Emote>())            
+        }
+        val jda = mock<JDA> {
+            on { emoteCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertTrue(jda.findEmotes(DUMMY).isEmpty())
     }
-    
+
     @Test
     fun `Test empty category functions`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<Category> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<Category>
-
-        `when`(snowflakeCacheView.asList()).thenReturn(emptyList<Category>())
-        `when`(jda.categoryCache).thenReturn(snowflakeCacheView)
+        val snowflakeCacheView = mock<SnowflakeCacheView<Category>> {
+            on { asList() }.thenReturn(emptyList<Category>())
+        }
+        val jda = mock<JDA> {
+            on { categoryCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertTrue(jda.findCategories(DUMMY).isEmpty())
     }
 
     @Test
     fun `Test empty text channel functions`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<TextChannel> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<TextChannel>
-
-        `when`(snowflakeCacheView.asList()).thenReturn(emptyList<TextChannel>())
-        `when`(jda.textChannelCache).thenReturn(snowflakeCacheView)
+        val snowflakeCacheView = mock<SnowflakeCacheView<TextChannel>> {
+            on { asList() }.thenReturn(emptyList<TextChannel>())
+        }
+        val jda = mock<JDA> {
+            on { textChannelCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertTrue(jda.findTextChannels(DUMMY).isEmpty())
     }
 
     @Test
     fun `Test empty voice channel functions`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<VoiceChannel> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<VoiceChannel>
-
-        `when`(snowflakeCacheView.asList()).thenReturn(emptyList<VoiceChannel>())
-        `when`(jda.voiceChannelCache).thenReturn(snowflakeCacheView)
+        val snowflakeCacheView = mock<SnowflakeCacheView<VoiceChannel>> {
+            on { asList() }.thenReturn(emptyList<VoiceChannel>())
+        }
+        val jda = mock<JDA> {
+            on { voiceChannelCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertTrue(jda.findVoiceChannels(DUMMY).isEmpty())
     }
@@ -108,114 +105,126 @@ internal class FindingFunctionsTest {
 
     @Test
     fun `Test empty user functions not cached`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<User> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<User>
-        val guild = mock(Guild::class.java)
-        val task = mock(Task::class.java) as Task<MutableList<Member>>
-        val member = mock(Member::class.java)
-        val user = mock(User::class.java)
-
-        `when`(snowflakeCacheView.asList()).thenReturn(emptyList<User>())
-        `when`(jda.guilds).thenReturn(mutableListOf(guild))
-        `when`(jda.userCache).thenReturn(snowflakeCacheView)
-        `when`(guild.loadMembers()).thenReturn(task)
-        `when`(task.get()).thenReturn(mutableListOf(member))
-        `when`(member.user).thenReturn(user)
-        `when`(user.name).thenReturn("dkim19375")
-        `when`(user.discriminator).thenReturn("6351")
+        val snowflakeCacheView = mock<SnowflakeCacheView<User>> {
+            on { asList() }.thenReturn(emptyList<User>())
+        }
+        val user = mock<User> {
+            on { name }.thenReturn("dkim19375")
+            on { discriminator }.thenReturn("6351")
+        }
+        val member = mock<Member> {
+            on { it.user }.thenReturn(user)
+        }
+        val task = mock<Task<MutableList<Member>>> {
+            on { get() }.thenReturn(mutableListOf(member))
+        }
+        val guild = mock<Guild> {
+            on { loadMembers() }.thenReturn(task)
+        }
+        val jda = mock<JDA> {
+            on { guilds }.thenReturn(mutableListOf(guild))
+            on { userCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertTrue(jda.findUsers(DUMMY, useCache = false).isEmpty())
     }
 
     @Test
     fun `Test empty emotes functions not cached`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<Emote> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<Emote>
-        val guild = mock(Guild::class.java)
-        val restAction = mock(RestAction::class.java) as RestAction<MutableList<ListedEmote>>
-        val emote = mock(ListedEmote::class.java)
-
-        `when`(snowflakeCacheView.asList()).thenReturn(emptyList<Emote>())
-        `when`(jda.guilds).thenReturn(mutableListOf(guild))
-        `when`(jda.emoteCache).thenReturn(snowflakeCacheView)
-        `when`(guild.retrieveEmotes()).thenReturn(restAction)
-        `when`(restAction.complete()).thenReturn(mutableListOf(emote))
-        `when`(emote.name).thenReturn("slight_smile")
+        val snowflakeCacheView = mock<SnowflakeCacheView<Emote>> {
+            on { asList() }.thenReturn(emptyList<Emote>())
+        }
+        val emote = mock<ListedEmote> {
+            on { name }.thenReturn("slight_smile")
+        }
+        val restAction = mock<RestAction<MutableList<ListedEmote>>> {
+            on { complete() }.thenReturn(mutableListOf(emote))
+        }
+        val guild = mock<Guild> {
+            on { retrieveEmotes() }.thenReturn(restAction)
+        }
+        val jda = mock<JDA> {
+            on { guilds }.thenReturn(mutableListOf(guild))
+            on { emoteCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertTrue(jda.findEmotes(DUMMY, useCache = false).isEmpty())
     }
-    
+
     // --------------- CACHED MUST NOT BE NULL ---------------
 
     @Test
     fun `Test user functions cached`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<User> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<User>
-        val user = mock(User::class.java)
-
-        `when`(snowflakeCacheView.asList()).thenReturn(listOf<User>(user))
-        `when`(jda.userCache).thenReturn(snowflakeCacheView)
-        `when`(user.name).thenReturn("dkim19375")
-        `when`(user.discriminator).thenReturn("6351")
+        val user = mock<User> {
+            on { name }.thenReturn("dkim19375")
+            on { discriminator }.thenReturn("6351")
+        }
+        val snowflakeCacheView = mock<SnowflakeCacheView<User>> {
+            on { asList() }.thenReturn(listOf(user))
+        }
+        val jda = mock<JDA> {
+            on { userCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertEquals(jda.findUsers("dkim19375#6351").size, 1)
     }
 
     @Test
     fun `Test emotes functions cached`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<Emote> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<Emote>
-        val emote = mock(Emote::class.java)
-
-        `when`(snowflakeCacheView.asList()).thenReturn(listOf<Emote>(emote))
-        `when`(jda.emoteCache).thenReturn(snowflakeCacheView)
-        `when`(emote.name).thenReturn("slight_smile")
+        val emote = mock<Emote> {
+            on { name }.thenReturn("slight_smile")
+        }
+        val snowflakeCacheView = mock<SnowflakeCacheView<Emote>> {
+            on { asList() }.thenReturn(listOf(emote))
+        }
+        val jda = mock<JDA> {
+            on { emoteCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertEquals(jda.findEmotes("slight_smile").size, 1)
     }
 
     @Test
     fun `Test category functions`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<Category> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<Category>
-        val category = mock(Category::class.java)
-
-        `when`(snowflakeCacheView.asList()).thenReturn(listOf<Category>(category))
-        `when`(jda.categoryCache).thenReturn(snowflakeCacheView)
-        `when`(category.name).thenReturn("cool-category")
+        val category = mock<Category> {
+            on { name }.thenReturn("cool-category")
+        }
+        val snowflakeCacheView = mock<SnowflakeCacheView<Category>> {
+            on { asList() }.thenReturn(listOf(category))
+        }
+        val jda = mock<JDA> {
+            on { categoryCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertEquals(jda.findCategories("cool-category").size, 1)
     }
 
     @Test
     fun `Test text channel functions`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<TextChannel> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<TextChannel>
-        val channel = mock(TextChannel::class.java)
-
-        `when`(snowflakeCacheView.asList()).thenReturn(listOf<TextChannel>(channel))
-        `when`(jda.textChannelCache).thenReturn(snowflakeCacheView)
-        `when`(channel.name).thenReturn("cool-channel")
+        val channel = mock<TextChannel> {
+            on { name }.thenReturn("cool-channel")
+        }
+        val snowflakeCacheView = mock<SnowflakeCacheView<TextChannel>> {
+            on { asList() }.thenReturn(listOf(channel))
+        }
+        val jda = mock<JDA> {
+            on { textChannelCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertEquals(jda.findTextChannels("cool-channel").size, 1)
     }
 
     @Test
     fun `Test voice channel functions`() {
-        val jda = mock(JDA::class.java)
-        val snowflakeCacheView: SnowflakeCacheView<VoiceChannel> =
-            mock(SnowflakeCacheView::class.java) as SnowflakeCacheView<VoiceChannel>
-        val channel = mock(VoiceChannel::class.java)
-
-        `when`(snowflakeCacheView.asList()).thenReturn(listOf<VoiceChannel>(channel))
-        `when`(jda.voiceChannelCache).thenReturn(snowflakeCacheView)
-        `when`(channel.name).thenReturn("cool-voice-channel")
+        val channel = mock<VoiceChannel> {
+            on { name }.thenReturn("cool-voice-channel")
+        }
+        val snowflakeCacheView = mock<SnowflakeCacheView<VoiceChannel>> {
+            on { asList() }.thenReturn(listOf(channel))
+        }
+        val jda = mock<JDA> {
+            on { voiceChannelCache }.thenReturn(snowflakeCacheView)
+        }
 
         assertEquals(jda.findVoiceChannels("cool-voice-channel").size, 1)
     }

@@ -26,12 +26,11 @@ package me.dkim19375.dkim19375jdautils.data
 
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.*
-import org.junit.runner.RunWith
-import org.powermock.api.mockito.PowerMockito.`when`
-import org.powermock.api.mockito.PowerMockito.mock
-import org.powermock.core.classloader.annotations.PrepareForTest
-import org.powermock.modules.junit4.PowerMockRunner
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.SelfUser
+import net.dv8tion.jda.api.entities.User
+import org.mockito.Mockito.`when`
+import org.mockito.kotlin.*
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -40,27 +39,30 @@ private const val USER_ID: Long = 123456789012345678L
 private const val SELF_USER_ID: Long = 234567890123456789L
 
 @Suppress("UNCHECKED_CAST")
-@RunWith(PowerMockRunner::class)
-@PrepareForTest(User::class, Member::class, GuildChannel::class, SelfUser::class, Role::class)
+// @RunWith(PowerMockRunner::class)
+// @PrepareForTest(User::class, Member::class, GuildChannel::class, SelfUser::class, Role::class)
 internal class WhitelistTest {
-    private val selfUser: SelfUser = mock(SelfUser::class.java).apply {
-        `when`(isBot).thenReturn(true)
-        `when`(idLong).thenReturn(SELF_USER_ID)
+    private val selfUser: SelfUser = mock {
+        on { isBot }.thenReturn(true)
+        on { idLong }.thenReturn(SELF_USER_ID)
     }
 
     @Test
     fun `Test default whitelist`() {
-        val user = mock(User::class.java)
-        val user2 = mock(User::class.java)
-        val jda = mock(JDA::class.java)
+        val jda = mock<JDA> {
+            on { selfUser }.thenReturn(selfUser)
+        }
+        val user = mock<User> {
+            on { isBot }.thenReturn(false)
+            on { idLong }.thenReturn(USER_ID)
+            on { it.jda }.thenReturn(jda)
+        }
+        val user2 = mock<User> {
+            on { isBot }.thenReturn(false)
+            on { idLong }.thenReturn(USER_ID)
+            on { it.jda }.thenReturn(jda)
+        }
 
-        `when`(user.isBot).thenReturn(false)
-        `when`(user.idLong).thenReturn(USER_ID)
-        `when`(user.jda).thenReturn(jda)
-        `when`(jda.selfUser).thenReturn(selfUser)
-        `when`(user2.isBot).thenReturn(false)
-        `when`(user2.idLong).thenReturn(USER_ID)
-        `when`(user2.jda).thenReturn(jda)
         `when`(selfUser.jda).thenReturn(jda)
 
         assertTrue(Whitelist().hasAccess(user))
@@ -70,18 +72,21 @@ internal class WhitelistTest {
 
     @Test
     fun `Test guild permissions`() {
-        val user = mock(User::class.java)
-        val jda = mock(JDA::class.java)
-        val member = mock(Member::class.java)
+        val jda = mock<JDA> {
+            on { selfUser }.thenReturn(selfUser)
+        }
+        val user = mock<User> {
+            on { isBot }.thenReturn(false)
+            on { idLong }.thenReturn(USER_ID)
+            on { it.jda }.thenReturn(jda)
+        }
         val permissions = mutableSetOf(Permission.VIEW_CHANNEL)
         val perms2 = permissions.plus(Permission.MESSAGE_WRITE)
+        val member = mock<Member> {
+            on { hasPermission(permissions) }.thenReturn(true)
+            on { hasPermission(perms2) }.thenReturn(false)
+        }
 
-        `when`(user.isBot).thenReturn(false)
-        `when`(user.idLong).thenReturn(USER_ID)
-        `when`(user.jda).thenReturn(jda)
-        `when`(jda.selfUser).thenReturn(selfUser)
-        `when`(member.hasPermission(permissions)).thenReturn(true)
-        `when`(member.hasPermission(perms2)).thenReturn(false)
         assertTrue(Whitelist().hasAccess(user))
         assertTrue(Whitelist(permissions = permissions).hasAccess(user, member))
         assertFalse(Whitelist(perms2).hasAccess(user, member))
@@ -89,48 +94,48 @@ internal class WhitelistTest {
 
     @Test
     fun `Test whitelist`() {
-        val user = mock(User::class.java)
-        val jda = mock(JDA::class.java)
-        val member = mock(Member::class.java)
+        val jda = mock<JDA> {
+            on { selfUser }.thenReturn(selfUser)
+        }
+        val user = mock<User> {
+            on { isBot }.thenReturn(false)
+            on { idLong }.thenReturn(USER_ID)
+            on { it.jda }.thenReturn(jda)
+        }
         val permissions = mutableSetOf(Permission.VIEW_CHANNEL)
 
-        `when`(user.isBot).thenReturn(false)
-        `when`(user.idLong).thenReturn(USER_ID)
-        `when`(user.jda).thenReturn(jda)
-        `when`(member.hasPermission(permissions)).thenReturn(true)
-        `when`(jda.selfUser).thenReturn(selfUser)
         assertTrue(Whitelist(permissions, null).hasAccess(user))
         assertTrue(Whitelist(permissions, setOf(USER_ID)).hasAccess(user))
     }
 
     @Test
     fun `Test blacklist`() {
-        val user = mock(User::class.java)
-        val jda = mock(JDA::class.java)
-        val member = mock(Member::class.java)
+        val jda = mock<JDA> {
+            on { selfUser }.thenReturn(selfUser)
+        }
+        val user = mock<User> {
+            on { isBot }.thenReturn(false)
+            on { idLong }.thenReturn(USER_ID)
+            on { it.jda }.thenReturn(jda)
+        }
         val permissions = mutableSetOf(Permission.VIEW_CHANNEL)
 
-        `when`(user.isBot).thenReturn(false)
-        `when`(user.idLong).thenReturn(USER_ID)
-        `when`(user.jda).thenReturn(jda)
-        `when`(member.hasPermission(permissions)).thenReturn(true)
-        `when`(jda.selfUser).thenReturn(selfUser)
         assertTrue(Whitelist(permissions, blacklist = setOf()).hasAccess(user))
         assertTrue(Whitelist(permissions, blacklist = setOf(SELF_USER_ID)).hasAccess(user))
     }
 
     @Test
     fun `Test ignore whitelist`() {
-        val user = mock(User::class.java)
-        val jda = mock(JDA::class.java)
-        val member = mock(Member::class.java)
+        val jda = mock<JDA> {
+            on { selfUser }.thenReturn(selfUser)
+        }
+        val user = mock<User> {
+            on { isBot }.thenReturn(false)
+            on { idLong }.thenReturn(USER_ID)
+            on { it.jda }.thenReturn(jda)
+        }
         val permissions = mutableSetOf(Permission.VIEW_CHANNEL)
 
-        `when`(user.isBot).thenReturn(false)
-        `when`(user.idLong).thenReturn(USER_ID)
-        `when`(user.jda).thenReturn(jda)
-        `when`(member.hasPermission(permissions)).thenReturn(true)
-        `when`(jda.selfUser).thenReturn(selfUser)
         assertTrue(Whitelist(permissions, null).hasAccess(user))
         assertTrue(Whitelist(permissions, setOf(USER_ID)).hasAccess(user))
         assertTrue(Whitelist(permissions, null, ignoreWhitelist = setOf(USER_ID)).hasAccess(user))
@@ -142,17 +147,16 @@ internal class WhitelistTest {
 
     @Test
     fun `Test whitelist bots`() {
-        val user = mock(User::class.java)
-        val jda = mock(JDA::class.java)
-        val member = mock(Member::class.java)
+        val jda = mock<JDA> {
+            on { selfUser }.thenReturn(selfUser)
+        }
+        val user = mock<User> {
+            on { idLong }.thenReturn(USER_ID)
+            on { it.jda }.thenReturn(jda)
+        }
         val permissions = mutableSetOf(Permission.VIEW_CHANNEL)
 
-        `when`(user.isBot).thenReturn(false)
-        `when`(user.idLong).thenReturn(USER_ID)
-        `when`(user.jda).thenReturn(jda)
         `when`(selfUser.jda).thenReturn(jda)
-        `when`(member.hasPermission(permissions)).thenReturn(true)
-        `when`(jda.selfUser).thenReturn(selfUser)
         assertFalse(Whitelist(permissions, setOf(), ignoreWhitelistBots = true).hasAccess(user))
         assertTrue(Whitelist(permissions, setOf(USER_ID), ignoreWhitelistBots = true).hasAccess(user))
         assertTrue(Whitelist(permissions, setOf(), ignoreWhitelistBots = true).hasAccess(selfUser))
