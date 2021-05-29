@@ -24,6 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.manager
 
+import dev.minn.jda.ktx.await
 import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.annotation.API
