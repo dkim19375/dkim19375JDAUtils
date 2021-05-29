@@ -24,19 +24,16 @@
 
 package me.dkim19375.dkim19375jdautils.util
 
+import kotlinx.coroutines.launch
+import me.dkim19375.dkim19375jdautils.SCOPE
 import me.dkim19375.dkim19375jdautils.annotation.API
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class ActionConsumer<T>(val task: () -> T) {
-    companion object {
-        val executor: ExecutorService = Executors.newCachedThreadPool()
-    }
 
     @API
     suspend fun await(
@@ -48,13 +45,13 @@ class ActionConsumer<T>(val task: () -> T) {
     }
 
     fun queue(success: ((T) -> Unit) = {}, failure: ((Throwable) -> Unit) = {}) {
-        executor.submit {
+        SCOPE.launch {
             val result: T
             try {
                 result = task()
             } catch (error: Throwable) {
                 failure(error)
-                return@submit
+                return@launch
             }
             success(result)
         }
@@ -66,7 +63,7 @@ class ActionConsumer<T>(val task: () -> T) {
 
     fun submit(): CompletableFuture<T> {
         val future = CompletableFuture<T>()
-        executor.submit future@{
+        SCOPE.launch future@{
             val result: T
             try {
                 result = task()

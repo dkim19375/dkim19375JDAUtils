@@ -25,6 +25,10 @@
 package me.dkim19375.dkim19375jdautils
 
 import dev.minn.jda.ktx.injectKTX
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.annotation.API
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkim19375jdautils.command.CommandType
@@ -41,6 +45,8 @@ import java.util.*
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
+val SCOPE = CoroutineScope(Dispatchers.Default)
+
 /**
  * Bot base
  *
@@ -49,6 +55,7 @@ import kotlin.system.exitProcess
 @API
 @Suppress("LeakingThis")
 abstract class BotBase {
+    private val ioScope = CoroutineScope(Dispatchers.IO)
     /**
      * The name of the bot
      */
@@ -126,7 +133,7 @@ abstract class BotBase {
      * The value of the map: The raw string/input
      */
     @API
-    open val consoleCommands = mutableMapOf<String, (String) -> Unit>()
+    open val consoleCommands = mutableMapOf<String, suspend (String) -> Unit>()
 
     /**
      * True if the bot is started, false if not
@@ -175,7 +182,7 @@ abstract class BotBase {
                 println("Stopped")
             }
         })
-        thread {
+        ioScope.launch {
             val scanner = Scanner(System.`in`)
             while (scanner.hasNext()) {
                 val next = scanner.nextLine()
@@ -190,7 +197,9 @@ abstract class BotBase {
                 }
                 for ((cmd, action) in consoleCommands) {
                     if (next.startsWith(cmd, ignoreCase = true)) {
-                        action(next)
+                        SCOPE.launch {
+                            action(next)
+                        }
                     }
                 }
             }

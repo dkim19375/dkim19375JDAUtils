@@ -24,8 +24,10 @@
 
 package me.dkim19375.dkim19375jdautils.event
 
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
+import me.dkim19375.dkim19375jdautils.SCOPE
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkim19375jdautils.data.MessageReceivedData
 import me.dkim19375.dkim19375jdautils.util.typedNull
@@ -80,7 +82,7 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
             return
         }
         bot.sendEvent { c ->
-            runBlocking {
+            SCOPE.launch {
                 try {
                     c.onMessageReceived(event.message.contentRaw, event)
                 } catch (e: Exception) {
@@ -99,9 +101,9 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         )
         if (msg != null) {
             bot.sendEvent { c ->
-                runBlocking {
+                SCOPE.launch {
                     if (!isValid(c, msg.command, msg.args.toList(), event)) {
-                        return@runBlocking
+                        return@launch
                     }
                     try {
                         c.onCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
@@ -119,10 +121,9 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
             return
         }
         bot.sendEvent { c ->
-            runBlocking {
+            SCOPE.launch {
                 try {
                     c.onGuildMessageReceived(event.message.contentRaw, event)
-
                 } catch (e: Exception) {
                     e.printStackTrace()
                     event.channel.sendMessage("An internal error has occurred!").queue()
@@ -132,9 +133,9 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         val msg = getMessage(event.message.contentRaw, event.guild.id, true)
         if (msg != null) {
             bot.sendEvent { c ->
-                runBlocking {
+                SCOPE.launch {
                     if (!isValid(c, msg.command, msg.args.toList(), event)) {
-                        return@runBlocking
+                        return@launch
                     }
                     try {
                         c.onGuildCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
@@ -152,7 +153,7 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
             return
         }
         bot.sendEvent { c ->
-            runBlocking {
+            SCOPE.launch {
                 try {
                     c.onPrivateMessageReceived(event.message.contentRaw, event)
                 } catch (e: Exception) {
@@ -165,9 +166,9 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         if (msg != null) {
             try {
                 bot.sendEvent { c ->
-                    runBlocking {
+                    SCOPE.launch {
                         if (!isValid(c, msg.command, msg.args.toList(), event)) {
-                            return@runBlocking
+                            return@launch
                         }
                         try {
                             c.onPrivateCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)

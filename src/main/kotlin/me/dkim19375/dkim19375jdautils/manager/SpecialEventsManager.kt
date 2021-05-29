@@ -25,8 +25,10 @@
 package me.dkim19375.dkim19375jdautils.manager
 
 import dev.minn.jda.ktx.await
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
+import me.dkim19375.dkim19375jdautils.SCOPE
 import me.dkim19375.dkim19375jdautils.annotation.API
 import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkim19375jdautils.util.*
@@ -54,14 +56,17 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     @API
     val singleEvents = mutableMapOf<Type, MutableMap<UUID, (Event) -> ActionConsumer<Pair<Boolean, Boolean>>>>()
 
-    override fun onGuildMessageReactionAdd(event: GuildMessageReactionAddEvent) =
-        runBlocking { onEvent(Type.REACTION_ADD, event) }
+    override fun onGuildMessageReactionAdd(event: GuildMessageReactionAddEvent) {
+        SCOPE.launch { onEvent(Type.REACTION_ADD, event) }
+    }
 
-    override fun onPrivateMessageReactionAdd(event: PrivateMessageReactionAddEvent) =
-        runBlocking { onEvent(Type.REACTION_ADD, event) }
+    override fun onPrivateMessageReactionAdd(event: PrivateMessageReactionAddEvent) {
+        SCOPE.launch { onEvent(Type.REACTION_ADD, event) }
+    }
 
-    override fun onMessageReactionAdd(event: MessageReactionAddEvent) =
-        runBlocking { onEvent(Type.REACTION_ADD, event) }
+    override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
+        SCOPE.launch { onEvent(Type.REACTION_ADD, event) }
+    }
 
     @API
     fun getTask(uuid: UUID): ((Event) -> ActionConsumer<Pair<Boolean, Boolean>>)? {
