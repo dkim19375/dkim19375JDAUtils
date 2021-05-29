@@ -34,7 +34,7 @@ import me.dkim19375.dkim19375jdautils.event.CustomListener
 import me.dkim19375.dkim19375jdautils.event.EventListener
 import me.dkim19375.dkim19375jdautils.file.YamlFile
 import me.dkim19375.dkim19375jdautils.impl.CustomJDABuilder
-import me.dkim19375.dkim19375jdautils.managers.SpecialEventsManager
+import me.dkim19375.dkim19375jdautils.manager.SpecialEventsManager
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.requests.GatewayIntent
 import java.util.*
