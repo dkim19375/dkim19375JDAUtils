@@ -49,8 +49,7 @@ internal class FindingFunctionsTest {
         val jda = mock<JDA> {
             on { userCache }.thenReturn(snowflakeCacheView)
         }
-
-        assertTrue(jda.findUsers(DUMMY).isEmpty())
+        assertTrue(jda.findUsersBlocking(DUMMY).isEmpty())
     }
 
     @Test
@@ -61,8 +60,7 @@ internal class FindingFunctionsTest {
         val jda = mock<JDA> {
             on { emoteCache }.thenReturn(snowflakeCacheView)
         }
-
-        assertTrue(jda.findEmotes(DUMMY).isEmpty())
+        assertTrue(jda.findEmotesBlocking(DUMMY).isEmpty())
     }
 
     @Test
@@ -126,7 +124,7 @@ internal class FindingFunctionsTest {
             on { userCache }.thenReturn(snowflakeCacheView)
         }
 
-        assertTrue(jda.findUsers(DUMMY, useCache = false).isEmpty())
+        assertTrue(jda.findUsersBlocking(DUMMY, useCache = false).isEmpty())
     }
 
     @Test
@@ -148,7 +146,7 @@ internal class FindingFunctionsTest {
             on { emoteCache }.thenReturn(snowflakeCacheView)
         }
 
-        assertTrue(jda.findEmotes(DUMMY, useCache = false).isEmpty())
+        assertTrue(jda.findEmotesBlocking(DUMMY, useCache = false).isEmpty())
     }
 
     // --------------- CACHED MUST NOT BE NULL ---------------
@@ -166,7 +164,7 @@ internal class FindingFunctionsTest {
             on { userCache }.thenReturn(snowflakeCacheView)
         }
 
-        assertEquals(jda.findUsers("dkim19375#6351").size, 1)
+        assertEquals(jda.findUsersBlocking("dkim19375#6351").size, 1)
     }
 
     @Test
@@ -181,7 +179,7 @@ internal class FindingFunctionsTest {
             on { emoteCache }.thenReturn(snowflakeCacheView)
         }
 
-        assertEquals(jda.findEmotes("slight_smile").size, 1)
+        assertEquals(jda.findEmotesBlocking("slight_smile").size, 1)
     }
 
     @Test
