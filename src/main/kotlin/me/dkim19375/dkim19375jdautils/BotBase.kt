@@ -137,13 +137,13 @@ abstract class BotBase {
      * @param guild The guild to get the prefix of
      * @return The prefix
      */
-    fun getPrefix(guild: Long): String = getPrefix(guild.toString())
+    fun getPrefix(guild: Long?): String = getPrefix(guild?.toString())
 
     /**
      * @param guild The guild to get the prefix of
      * @return The prefix
      */
-    abstract fun getPrefix(guild: String): String
+    abstract fun getPrefix(guild: String?): String
 
     /**
      * Get all command types

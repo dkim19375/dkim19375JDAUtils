@@ -27,33 +27,39 @@ package me.dkim19375.dkim19375jdautils.event
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkim19375jdautils.data.MessageReceivedData
+import me.dkim19375.dkim19375jdautils.util.typedNull
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class EventListener(private val bot: BotBase) : ListenerAdapter() {
-    private fun getMessage(message: String, serverId: String?): MessageReceivedData? {
-        if (serverId == null) {
-            if (!message.startsWith(bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!"))) {
-                return null
+    private fun getMessage(message: String, serverId: String?, guild: Boolean): MessageReceivedData? {
+        val prefix: String
+        if (guild) {
+            if (serverId == null) {
+                if (!message.startsWith(bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!"))) {
+                    return null
+                }
             }
-        }
-        val prefix: String = if (serverId == null) bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!")
-        else if (message.startsWith(bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!"))) {
-            bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!")
-        } else {
-            if (message.startsWith(bot.getPrefix(serverId), ignoreCase = true)) {
-                bot.getPrefix(serverId)
+            prefix = if (serverId == null) bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!")
+            else if (message.startsWith(bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!"))) {
+                bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!")
             } else {
-                return null
+                if (message.startsWith(bot.getPrefix(serverId), ignoreCase = true)) {
+                    bot.getPrefix(serverId)
+                } else {
+                    return null
+                }
             }
+        } else {
+            prefix = bot.getPrefix(typedNull<Long>())
         }
         if (message.length <= prefix.length) {
             return null
         }
         var command = message
-        command = command.substring(prefix.length)
+        command = command.removePrefix(prefix)
         command = command.trim()
         val allArray = command.split(" ").toTypedArray()
         command = command.split(" ").toTypedArray()[0]
@@ -83,7 +89,8 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
                 event.guild
             } catch (_: IllegalStateException) {
                 null
-            }?.id
+            }?.id,
+            event.isFromGuild
         )
         if (msg != null) {
             bot.sendEvent { c ->
@@ -110,7 +117,7 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
             e.printStackTrace()
             event.channel.sendMessage("An internal error has occurred!").queue()
         }
-        val msg = getMessage(event.message.contentRaw, event.guild.id)
+        val msg = getMessage(event.message.contentRaw, event.guild.id, true)
         if (msg != null) {
             bot.sendEvent { c ->
                 if (!isValid(c, msg.command, msg.args.toList(), event)) {
@@ -136,7 +143,7 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
             e.printStackTrace()
             event.channel.sendMessage("An internal error has occurred!").queue()
         }
-        val msg = getMessage(event.message.contentRaw, null)
+        val msg = getMessage(event.message.contentRaw, null, false)
         if (msg != null) {
             try {
                 bot.sendEvent { c ->

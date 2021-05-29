@@ -24,6 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.util
 
+import me.dkim19375.dkim19375jdautils.annotation.API
 import net.dv8tion.jda.api.requests.RestAction
 import java.util.concurrent.Future
 import kotlin.coroutines.Continuation
@@ -39,6 +40,7 @@ suspend fun <T> RestAction<T>.await(
     this.queue({ cont.resume(it) }, { failure(cont, it) })
 }
 
+@API
 suspend fun <T> Future<T>.await(
     failure: (Continuation<T>, Throwable) -> Unit = { continuation, throwable ->
         continuation.resumeWithException(throwable)

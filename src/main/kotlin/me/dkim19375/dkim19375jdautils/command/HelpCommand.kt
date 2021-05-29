@@ -26,10 +26,12 @@ package me.dkim19375.dkim19375jdautils.command
 
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.annotation.API
-import me.dkim19375.dkim19375jdautils.embed.EmbedManager
 import me.dkim19375.dkim19375jdautils.embed.EmbedUtils
+import me.dkim19375.dkim19375jdautils.embed.KotlinEmbedBuilder
 import me.dkim19375.dkim19375jdautils.util.getCommand
 import me.dkim19375.dkim19375jdautils.util.getOfType
+import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 
@@ -59,6 +61,25 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
         }.toSet()
     override val type = OTHER_TYPE
     override val minArgs = 1
+    open val embed: (MessageReceivedEvent, String) -> MessageEmbed = { event, cmd ->
+        KotlinEmbedBuilder.getFirstPreset(
+            title = "${bot.name} $name: ${type.displayname}",
+            color = Color.BLUE,
+            cmd = cmd,
+            user = event.author
+        ).addField(
+            "TIP:", "Do ${bot.getPrefix(event.guild.id)}help <command> " +
+                    "to view information about a specific command!", false
+        ).addField(
+            "Information:",
+            "Commands in the ${type.displayname} category",
+            false
+        ).addField(
+            EmbedUtils.getEmbedGroup("Commands - ${type.displayname}:", bot.commands.getOfType(type).map { c ->
+                "${c.command} - ${c.description}"
+            })
+        ).build()
+    }
 
     /**
      * On help command
@@ -69,12 +90,12 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
      * @param all The entire raw command **excluding** the prefix
      * @param event The [GuildMessageReceivedEvent]
      */
-    override fun onGuildCommand(
+    override fun onCommand(
         cmd: String,
         args: List<String>,
         prefix: String,
         all: String,
-        event: GuildMessageReceivedEvent
+        event: MessageReceivedEvent
     ) {
         val type = args[0].getCommandType(bot)
         if (type == null) {
@@ -86,17 +107,6 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
             sendHelpUsage(cmd, event, command)
             return
         }
-        val embedManager = EmbedManager("${bot.name} $name: ${type.displayname}", Color.BLUE, cmd, event.author)
-        embedManager.embedBuilder.addField(
-            "TIP:", "Do ${bot.getPrefix(event.guild.id)}help <command> " +
-                    "to view information about a specific command!", false
-        )
-        embedManager.embedBuilder.addField("Information:", "Commands in the ${type.displayname} category", false)
-        embedManager.embedBuilder.addField(
-            EmbedUtils.getEmbedGroup("Commands - ${type.displayname}:", bot.commands.getOfType(type).map { c ->
-                "${c.command} - ${c.description}"
-            })
-        )
-        event.channel.sendMessage(embedManager.embedBuilder.build()).queue()
+        event.channel.sendMessage(embed(event, cmd)).queue()
     }
 }

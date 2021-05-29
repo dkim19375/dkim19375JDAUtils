@@ -26,12 +26,10 @@ package me.dkim19375.dkim19375jdautils.command
 
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.annotation.API
-import me.dkim19375.dkim19375jdautils.embed.EmbedManager
+import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkim19375jdautils.embed.EmbedUtils
-import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.GuildChannel
-import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.User
+import me.dkim19375.dkim19375jdautils.embed.KotlinEmbedBuilder
+import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
@@ -53,8 +51,30 @@ abstract class Command(private val bot: BotBase) {
     abstract val arguments: Set<CommandArg>
     abstract val type: CommandType
     abstract val minArgs: Int
-    open val permissions: Set<Permission> = setOf()
-    open val whitelistUsers: Set<Long> = setOf()
+    open val permissions: Whitelist = Whitelist()
+    open val helpEmbed: (
+        user: User,
+        guild: Guild?,
+        cmd: String,
+        command: Command
+    ) -> MessageEmbed = { user, guild, cmd, command ->
+        KotlinEmbedBuilder.getFirstPreset(
+            title = "${bot.name} ${command.name}",
+            color = Color.BLUE,
+            cmd = cmd,
+            user = user
+        ).addField(
+            "Information:",
+            command.description.plus("\n**Prefix: ${bot.getPrefix(guild?.idLong)}**"),
+            false
+        ).addField(
+            EmbedUtils.getEmbedGroup("Aliases:", command.aliases)
+        ).addField(
+            EmbedUtils.getEmbedGroup("Arguments:", command.arguments.map { arg ->
+                "${arg.arg} - ${arg.description}"
+            })
+        ).build()
+    }
 
     /**
      * Send help usage
@@ -77,8 +97,8 @@ abstract class Command(private val bot: BotBase) {
         val member: Member? = (event as? GuildMessageReceivedEvent)?.member
         val guild = when (event) {
             is GuildMessageReceivedEvent -> event.guild
-            is MessageReceivedEvent -> event.guild
-            else -> return
+            is MessageReceivedEvent -> if (event.isFromGuild) event.guild else null
+            else -> null
         }
         val channel = when (event) {
             is GuildMessageReceivedEvent -> event.channel
@@ -86,41 +106,10 @@ abstract class Command(private val bot: BotBase) {
             is MessageReceivedEvent -> event.channel
             else -> return
         }
-        if (!hasPermissions(user, member, channel as? GuildChannel)) {
+        if (!permissions.hasAccess(user, member, channel as? GuildChannel)) {
             return
         }
-        val embedManager = EmbedManager("${bot.name} ${command.name}", Color.BLUE, cmd, user)
-        embedManager.embedBuilder.addField(
-            "Information:",
-            command.description.plus(
-                "\n**Prefix: ${bot.getPrefix(guild.idLong)}**"
-            ), false
-        )
-        embedManager.embedBuilder.addField(EmbedUtils.getEmbedGroup("Aliases:", command.aliases))
-        embedManager.embedBuilder.addField(EmbedUtils.getEmbedGroup("Arguments:", command.arguments.map { arg ->
-            "${arg.arg} - ${arg.description}"
-        }))
-        channel.sendMessage(embedManager.embedBuilder.build()).queue()
-    }
-
-    /**
-     * Checks if a user has permissions to run this [Command]
-     *
-     * @param user The [User] who sent the command
-     * @param member The [Member] who sent the command, null if not in a guild
-     * @param channel the [GuildChannel] of where the command was set, null if not in a guild
-     * @return True if the user has permissions, false if not
-     */
-    @API
-    open fun hasPermissions(user: User, member: Member? = null, channel: GuildChannel? = null): Boolean {
-        if (whitelistUsers.isNotEmpty() && !whitelistUsers.contains(user.idLong)) {
-            return false
-        }
-        member ?: return true
-        if (channel != null) {
-            return member.hasPermission(channel, permissions)
-        }
-        return member.hasPermission(permissions)
+        channel.sendMessage(helpEmbed(user, guild, cmd, command)).queue()
     }
 
     /**

@@ -268,6 +268,11 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
         return length
     }
 
+    fun addField(vararg fields: Field): KotlinEmbedBuilder {
+        this.fields.addAll(fields)
+        return this
+    }
+
     fun addField(name: String? = null, value: String? = null, inline: Boolean): KotlinEmbedBuilder {
         if (name == null && value == null) return this
         fields.add(Field(name, value, inline))

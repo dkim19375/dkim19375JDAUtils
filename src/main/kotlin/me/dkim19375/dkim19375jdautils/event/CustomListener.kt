@@ -26,7 +26,6 @@ package me.dkim19375.dkim19375jdautils.event
 
 import me.dkim19375.dkim19375jdautils.annotation.API
 import me.dkim19375.dkim19375jdautils.command.Command
-import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -44,6 +43,12 @@ abstract class CustomListener {
      */
     @API
     open val antiBot: Boolean = true
+
+    /**
+     * @property ignoreSelf True if the commands should be ignored if it was ran by this bot
+     */
+    @API
+    open val ignoreSelf: Boolean = true
 
     /**
      * @param event The [MessageReceivedEvent] of this message
@@ -100,18 +105,15 @@ abstract class CustomListener {
         if (user.isBot && antiBot) {
             return false
         }
+        if (user.jda.selfUser.idLong == user.idLong) {
+            return false
+        }
         member?.let {
-            if (command.hasPermissions(user, member, (event as? GuildMessageReceivedEvent)?.channel)) {
+            if (command.permissions.hasAccess(user, member, (event as? GuildMessageReceivedEvent)?.channel)) {
                 return@let
             }
             if (event !is MessageReceivedEvent) {
-                channel.sendMessage(
-                    "You do not have permission! (Required permission${if (command.permissions.size <= 1) "" else "s"}: ${
-                        command.permissions.joinToString(
-                            ", ", transform = Permission::getName
-                        )
-                    })"
-                ).queue()
+                channel.sendMessage("You do not have permission!").queue()
             }
             return false
         }
@@ -119,6 +121,7 @@ abstract class CustomListener {
             when (event) {
                 is PrivateMessageReceivedEvent -> command.sendHelpUsage(cmd, event)
                 is GuildMessageReceivedEvent -> command.sendHelpUsage(cmd, event)
+                is MessageReceivedEvent -> command.sendHelpUsage(cmd, event)
             }
             return false
         }
