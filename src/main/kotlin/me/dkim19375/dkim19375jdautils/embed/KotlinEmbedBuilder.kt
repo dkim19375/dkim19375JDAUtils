@@ -109,15 +109,15 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
          * Images: [https://imgur.com/a/ozADBCe](https://imgur.com/a/ozADBCe)
          */
         fun getSecondPreset(
-            aboveTitle: String? = null,
             title: String? = null,
             color: Color? = null,
             cmd: String? = null,
             user: User? = null,
+            fields: List<Field> = emptyList(),
             showTimestamp: Boolean = true,
+            aboveTitle: String? = null,
             aboveTitleLink: String? = null,
-            aboveTitleImage: String? = null,
-            fields: List<Field> = emptyList()
+            aboveTitleImage: String? = null
         ): KotlinEmbedBuilder {
             val builder = KotlinEmbedBuilder()
             builder.setAuthorSafe(aboveTitle, aboveTitleLink, aboveTitleImage)
