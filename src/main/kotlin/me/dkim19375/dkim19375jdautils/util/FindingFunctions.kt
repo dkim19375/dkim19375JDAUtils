@@ -26,10 +26,13 @@
 
 package me.dkim19375.dkim19375jdautils.util
 
+import dev.minn.jda.ktx.await
+import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.sharding.ShardManager
+import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
 
 val DISCORD_ID: Pattern = Pattern.compile("\\d{17,20}")
@@ -39,26 +42,37 @@ val CHANNEL_MENTION: Pattern = Pattern.compile("<#(\\d{17,20})>")
 val ROLE_MENTION: Pattern = Pattern.compile("<@&(\\d{17,20})>")
 val EMOTE_MENTION: Pattern = Pattern.compile("<:(.{2,32}):(\\d{17,20})>")
 
-private fun ShardManager.retrieveUserById(id: String, cache: Boolean): User? {
+private suspend fun ShardManager.retrieveUserById(id: String, cache: Boolean): User? {
     return retrieveUserById(id.toLongOrNull() ?: return null, cache)
 }
 
-private fun ShardManager.retrieveUserById(id: Long, cache: Boolean): User? =
-    if (cache) getUserById(id) else retrieveUserById(id).complete()
+private suspend fun ShardManager.retrieveUserById(id: Long, cache: Boolean): User? =
+    if (cache) getUserById(id) else retrieveUserById(id).await()
 
-fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<User> {
+fun JDA.findUsersBlocking(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<User> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findUsers(query, useShardManager, useCache)
+        }
+    })
+    return action.get()
+}
+
+suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<User> {
     val userMention = USER_MENTION.matcher(query)
     val fullRefMatch = FULL_USER_REF.matcher(query)
     val manager = if (useShardManager) shardManager else null
     val cache = manager?.userCache ?: userCache
-    val users = if (useCache) { cache.asList()} else {
+    val users = if (useCache) {
+        cache.asList()
+    } else {
         manager?.guilds
             ?.map(Guild::loadMembers)
-            ?.map { it.get() }
+            ?.map { it.await() }
             ?.combine()
             ?.map(Member::getUser)
             ?: guilds.map(Guild::loadMembers)
-                .map { it.get() }
+                .map { it.await() }
                 .combine()
                 .map(Member::getUser)
     }
@@ -66,7 +80,7 @@ fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCache: Boo
         userMention.matches() -> {
             val user =
                 if (manager != null) manager.retrieveUserById(userMention.group(1), useCache)
-                else retrieveUserById(userMention.group(1), !useCache).complete()
+                else retrieveUserById(userMention.group(1), !useCache).await()
             if (user != null) return listOf(user)
         }
         fullRefMatch.matches() -> {
@@ -81,7 +95,7 @@ fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCache: Boo
             val user = if (manager != null) manager.retrieveUserById(query, useCache) else retrieveUserById(
                 query,
                 !useCache
-            ).complete()
+            ).await()
             if (user != null) return listOf(user)
         }
     }
@@ -106,11 +120,20 @@ fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCache: Boo
     }
 }
 
-fun Guild.findBannedUsers(query: String, useCache: Boolean = true): List<User>? {
+fun Guild.findBannedUsersBlocking(query: String, useCache: Boolean = true): List<User>? {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findBannedUsers(query, useCache)
+        }
+    })
+    return action.get()
+}
+
+suspend fun Guild.findBannedUsers(query: String, useCache: Boolean = true): List<User>? {
     var mQuery = query
     val bans: List<User>
     try {
-        bans = retrieveBanList().complete().map { it.user }.toList()
+        bans = retrieveBanList().await().map { it.user }.toList()
     } catch (e: InsufficientPermissionException) {
         return null
     }
@@ -119,7 +142,7 @@ fun Guild.findBannedUsers(query: String, useCache: Boolean = true): List<User>? 
     when {
         userMention.matches() -> {
             val id = userMention.group(1)
-            val user = jda.retrieveUserById(id, !useCache).complete()
+            val user = jda.retrieveUserById(id, !useCache).await()
             if (user != null && bans.contains(user)) return listOf(user)
             for (u in bans) if (u.id == id) return listOf(u)
         }
@@ -128,7 +151,7 @@ fun Guild.findBannedUsers(query: String, useCache: Boolean = true): List<User>? 
             mQuery = mQuery.substring(0, mQuery.length - 5).trim()
         }
         DISCORD_ID.matcher(mQuery).matches() -> {
-            val user = jda.retrieveUserById(mQuery, !useCache).complete()
+            val user = jda.retrieveUserById(mQuery, !useCache).await()
             if (user != null && bans.contains(user)) return listOf(user)
             for (u in bans) if (u.id == mQuery) return listOf(u)
         }
@@ -156,18 +179,27 @@ fun Guild.findBannedUsers(query: String, useCache: Boolean = true): List<User>? 
     }
 }
 
-fun Guild.findMembers(query: String, useCache: Boolean = true): List<Member> {
+fun Guild.findMembersBlocking(query: String, useCache: Boolean = true): List<Member> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findMembers(query, useCache)
+        }
+    })
+    return action.get()
+}
+
+suspend fun Guild.findMembers(query: String, useCache: Boolean = true): List<Member> {
     val userMention = USER_MENTION.matcher(query)
     val fullRefMatch = FULL_USER_REF.matcher(query)
     when {
         userMention.matches() -> {
-            val member = retrieveMemberById(userMention.group(1), !useCache).complete()
+            val member = retrieveMemberById(userMention.group(1), !useCache).await()
             if (member != null) return listOf(member)
         }
         fullRefMatch.matches() -> {
             val lowerName = fullRefMatch.group(1).lowercase()
             val discrim = fullRefMatch.group(2)
-            val members = (if (useCache) memberCache.toList() else loadMembers().get())
+            val members = (if (useCache) memberCache.toList() else loadMembers().await())
                 .filter { member: Member ->
                     member.user.name.lowercase() == lowerName && member.user
                         .discriminator == discrim
@@ -175,7 +207,7 @@ fun Guild.findMembers(query: String, useCache: Boolean = true): List<Member> {
             if (members.isNotEmpty()) return members.toList()
         }
         DISCORD_ID.matcher(query).matches() -> {
-            val member = retrieveMemberById(query, !useCache).complete()
+            val member = retrieveMemberById(query, !useCache).await()
             if (member != null) {
                 return listOf(member)
             }
@@ -186,7 +218,7 @@ fun Guild.findMembers(query: String, useCache: Boolean = true): List<Member> {
     val startswith = mutableListOf<Member>()
     val contains = mutableListOf<Member>()
     val lowerquery = query.lowercase()
-    (if (useCache) memberCache.toList() else loadMembers().get()).forEach { member: Member ->
+    (if (useCache) memberCache.toList() else loadMembers().await()).forEach { member: Member ->
         val name = member.user.name
         val effName = member.effectiveName
         when {
@@ -208,6 +240,15 @@ fun Guild.findMembers(query: String, useCache: Boolean = true): List<Member> {
     }
 }
 
+fun Guild.findTextChannelsBlocking(query: String): List<TextChannel> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findTextChannels(query)
+        }
+    })
+    return action.get()
+}
+
 fun Guild.findTextChannels(query: String): List<TextChannel> {
     val channelMention = CHANNEL_MENTION.matcher(query)
     when {
@@ -221,6 +262,15 @@ fun Guild.findTextChannels(query: String): List<TextChannel> {
         }
     }
     return textChannelCache.asList().findTextChannels(query)
+}
+
+fun JDA.findTextChannelsBlocking(query: String, useShardManager: Boolean = false): List<TextChannel> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findTextChannels(query, useShardManager)
+        }
+    })
+    return action.get()
 }
 
 fun JDA.findTextChannels(query: String, useShardManager: Boolean = false): List<TextChannel> {
@@ -240,6 +290,15 @@ fun JDA.findTextChannels(query: String, useShardManager: Boolean = false): List<
         }
     }
     return (manager?.textChannelCache ?: textChannelCache).asList().findTextChannels(query)
+}
+
+fun List<TextChannel>.findTextChannelsBlocking(query: String): List<TextChannel> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findTextChannels(query)
+        }
+    })
+    return action.get()
 }
 
 fun List<TextChannel>.findTextChannels(query: String): List<TextChannel> {
@@ -264,12 +323,30 @@ fun List<TextChannel>.findTextChannels(query: String): List<TextChannel> {
     }
 }
 
+fun Guild.findVoiceChannelsBlocking(query: String): List<VoiceChannel> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findVoiceChannels(query)
+        }
+    })
+    return action.get()
+}
+
 fun Guild.findVoiceChannels(query: String): List<VoiceChannel> {
     if (DISCORD_ID.matcher(query).matches()) {
         val vc = getVoiceChannelById(query)
         if (vc != null) return listOf(vc)
     }
     return voiceChannelCache.asList().findVoiceChannels(query)
+}
+
+fun JDA.findVoiceChannelsBlocking(query: String, useShardManager: Boolean = false): List<VoiceChannel> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findVoiceChannels(query, useShardManager)
+        }
+    })
+    return action.get()
 }
 
 fun JDA.findVoiceChannels(query: String, useShardManager: Boolean = false): List<VoiceChannel> {
@@ -279,6 +356,15 @@ fun JDA.findVoiceChannels(query: String, useShardManager: Boolean = false): List
         if (vc != null) return listOf(vc)
     }
     return (manager?.voiceChannelCache ?: voiceChannelCache).asList().findVoiceChannels(query)
+}
+
+fun List<VoiceChannel>.findVoiceChannelsBlocking(query: String): List<VoiceChannel> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findVoiceChannels(query)
+        }
+    })
+    return action.get()
 }
 
 fun List<VoiceChannel>.findVoiceChannels(query: String): List<VoiceChannel> {
@@ -303,12 +389,30 @@ fun List<VoiceChannel>.findVoiceChannels(query: String): List<VoiceChannel> {
     }
 }
 
+fun Guild.findCategoriesBlocking(query: String): List<Category> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findCategories(query)
+        }
+    })
+    return action.get()
+}
+
 fun Guild.findCategories(query: String): List<Category> {
     if (DISCORD_ID.matcher(query).matches()) {
         val cat = getCategoryById(query)
         if (cat != null) return listOf(cat)
     }
     return categoryCache.asList().findCategories(query)
+}
+
+fun JDA.findCategoriesBlocking(query: String, useShardManager: Boolean = false): List<Category> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findCategories(query, useShardManager)
+        }
+    })
+    return action.get()
 }
 
 fun JDA.findCategories(query: String, useShardManager: Boolean = false): List<Category> {
@@ -318,6 +422,15 @@ fun JDA.findCategories(query: String, useShardManager: Boolean = false): List<Ca
         if (cat != null) return listOf(cat)
     }
     return categoryCache.asList().findCategories(query)
+}
+
+fun List<Category>.findCategoriesBlocking(query: String): List<Category> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findCategories(query)
+        }
+    })
+    return action.get()
 }
 
 fun List<Category>.findCategories(
@@ -342,6 +455,15 @@ fun List<Category>.findCategories(
         wrongcase.isNotEmpty() -> wrongcase
         else -> startswith.ifEmpty { contains }
     }
+}
+
+fun Guild.findRolesBlocking(query: String): List<Role> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findRoles(query)
+        }
+    })
+    return action.get()
 }
 
 fun Guild.findRoles(query: String): List<Role> {
@@ -374,7 +496,16 @@ fun Guild.findRoles(query: String): List<Role> {
     }
 }
 
-fun Guild.findEmotes(query: String, useCache: Boolean = true): List<Emote> {
+fun Guild.findEmotesBlocking(query: String): List<Emote> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findEmotes(query)
+        }
+    })
+    return action.get()
+}
+
+suspend fun Guild.findEmotes(query: String, useCache: Boolean = true): List<Emote> {
     val mentionMatcher = EMOTE_MENTION.matcher(query)
     when {
         DISCORD_ID.matcher(query).matches() -> {
@@ -388,10 +519,19 @@ fun Guild.findEmotes(query: String, useCache: Boolean = true): List<Emote> {
             if (emote != null && emote.name == emoteName) return listOf(emote)
         }
     }
-    return (if (useCache) emoteCache.asList() else retrieveEmotes().complete()).findEmotes(query)
+    return (if (useCache) emoteCache.asList() else retrieveEmotes().await()).findEmotes(query)
 }
 
-fun JDA.findEmotes(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<Emote> {
+fun JDA.findEmotesBlocking(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<Emote> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findEmotes(query, useShardManager, useCache)
+        }
+    })
+    return action.get()
+}
+
+suspend fun JDA.findEmotes(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<Emote> {
     val mentionMatcher = EMOTE_MENTION.matcher(query)
     val manager = if (useShardManager) shardManager else null
     when {
@@ -411,12 +551,21 @@ fun JDA.findEmotes(query: String, useShardManager: Boolean = false, useCache: Bo
     } else {
         guilds
             .map(Guild::retrieveEmotes)
-            .map { it.complete() }
+            .map { it.await() }
             .combine()
             .map {
                 it as Emote
             }
     }).findEmotes(query)
+}
+
+fun List<Emote>.findEmotesBlocking(query: String): List<Emote> {
+    val action = CompletableFuture.completedFuture(run {
+        runBlocking {
+            findEmotes(query)
+        }
+    })
+    return action.get()
 }
 
 fun List<Emote>.findEmotes(

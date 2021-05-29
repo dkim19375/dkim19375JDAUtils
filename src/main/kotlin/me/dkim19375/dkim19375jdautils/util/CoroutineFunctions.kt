@@ -24,28 +24,18 @@
 
 package me.dkim19375.dkim19375jdautils.util
 
+import kotlinx.coroutines.suspendCancellableCoroutine
 import me.dkim19375.dkim19375jdautils.annotation.API
 import net.dv8tion.jda.api.requests.RestAction
+import net.dv8tion.jda.api.utils.concurrent.Task
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-suspend fun <T> RestAction<T>.await(
-    failure: (Continuation<T>, Throwable) -> Unit = { continuation, throwable ->
-        continuation.resumeWithException(throwable)
-    },
-): T = suspendCoroutine { cont ->
-    this.queue({ cont.resume(it) }, { failure(cont, it) })
-}
-
-@API
-suspend fun <T> Future<T>.await(
-    failure: (Continuation<T>, Throwable) -> Unit = { continuation, throwable ->
-        continuation.resumeWithException(throwable)
-    }
-): T = await(failure) { get() }
+suspend fun <T> RestAction<T>.awaitNullable(): T? = submit().awaitNullable()
 
 suspend fun <T> await(
     failure: (Continuation<T>, Throwable) -> Unit = { continuation, throwable ->
@@ -58,4 +48,26 @@ suspend fun <T> await(
     } catch (e: Throwable) {
         failure(cont, e)
     }
+}
+
+suspend fun <T> CompletableFuture<T>.awaitNullable() = suspendCancellableCoroutine<T?> {
+    it.invokeOnCancellation { cancel(true) }
+    whenComplete { r, e ->
+        when {
+            e != null -> it.resume(null)
+            else -> it.resume(r)
+        }
+    }
+}
+
+suspend fun <T> Task<T>.await() = suspendCancellableCoroutine<T> {
+    it.invokeOnCancellation { cancel() }
+    onSuccess { r -> it.resume(r)  }
+    onError { e -> it.resumeWithException(e) }
+}
+
+suspend fun <T> Task<T>.awaitNullable() = suspendCancellableCoroutine<T?> {
+    it.invokeOnCancellation { cancel() }
+    onSuccess { r -> it.resume(r)  }
+    onError { _ -> it.resume(null) }
 }
