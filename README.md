@@ -1,3 +1,5 @@
+![Maven Central](https://img.shields.io/maven-central/v/io.github.dkim19375/dkim19375jdautils)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dkim19375/dkim19375JDAUtils/Testing%20CI%20with%20Gradle)
 # dkim19375JDAUtils
 A kotlin library for JDA to help to make discord bots easier!
 
