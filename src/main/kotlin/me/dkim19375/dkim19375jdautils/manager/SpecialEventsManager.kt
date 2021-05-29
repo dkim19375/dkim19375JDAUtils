@@ -347,18 +347,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         return Pair(first = false, second = false)
     }
 
-    /**
-     * Type
-     *
-     * @property classes
-     * @constructor Create empty Type
-     */
     enum class Type(@API val classes: Set<KClass<out Event>>) {
-        /**
-         * R e a c t i o n_a d d
-         *
-         * @constructor Create empty R e a c t i o n_a d d
-         */
         REACTION_ADD(
             setOf(
                 MessageReactionAddEvent::class,

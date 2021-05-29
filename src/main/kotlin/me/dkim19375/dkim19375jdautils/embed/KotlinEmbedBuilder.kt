@@ -41,6 +41,13 @@ import java.util.*
 private const val ZERO_WIDTH_SPACE = "\u200E"
 private val URL_PATTERN = Regex("\\s*(https?|attachment)://\\S+\\s*", RegexOption.IGNORE_CASE)
 
+/**
+ * Kotlin embed builder
+ *
+ * Image: [https://i.imgur.com/9ZAmt5X.png](https://i.imgur.com/9ZAmt5X.png)
+ *
+ * @param embed A [MessageEmbed] to copy values from
+ */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
     val fields: MutableList<Field> = mutableListOf()
@@ -76,7 +83,8 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
     companion object {
         /**
          * Get preset #1
-         * Image: https://i.imgur.com/XNrKXVu.png
+         *
+         * Image: [https://i.imgur.com/XNrKXVu.png](https://i.imgur.com/XNrKXVu.png)
          */
         fun getFirstPreset(
             title: String? = null,
@@ -97,7 +105,8 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
 
         /**
          * Get preset #1
-         * Images: https://imgur.com/a/ozADBCe
+         *
+         * Images: [https://imgur.com/a/ozADBCe](https://imgur.com/a/ozADBCe)
          */
         fun getSecondPreset(
             aboveTitle: String? = null,
