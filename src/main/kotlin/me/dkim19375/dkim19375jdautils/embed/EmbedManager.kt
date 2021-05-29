@@ -32,6 +32,10 @@ import java.time.Instant
 import java.time.temporal.TemporalAccessor
 
 @API
+@Deprecated(
+    "Replaced with KotlinEmbedBuilder",
+    ReplaceWith("me.dkim19375.dkim19375jdautils.embed.KotlinEmbedBuilder")
+)
 class EmbedManager {
     @API
     val embedBuilder = EmbedBuilder()
