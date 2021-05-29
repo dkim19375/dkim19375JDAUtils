@@ -24,13 +24,27 @@
 
 package me.dkim19375.dkim19375jdautils.util
 
+import me.dkim19375.dkim19375jdautils.annotation.API
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class ActionConsumer<T>(val task: () -> T) {
     companion object {
         val executor: ExecutorService = Executors.newCachedThreadPool()
+    }
+
+    @API
+    suspend fun await(
+        failure: (Continuation<T>, Throwable) -> Unit = { continuation, throwable ->
+            continuation.resumeWithException(throwable)
+        },
+    ): T = suspendCoroutine { cont ->
+        this.queue({ cont.resume(it) }, { failure(cont, it) })
     }
 
     fun queue(success: ((T) -> Unit) = {}, failure: ((Throwable) -> Unit) = {}) {
