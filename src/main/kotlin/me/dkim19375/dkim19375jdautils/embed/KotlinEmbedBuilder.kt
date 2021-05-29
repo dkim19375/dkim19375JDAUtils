@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.entities.EmbedType
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.MessageEmbed.*
 import net.dv8tion.jda.api.entities.Role
+import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.internal.entities.EntityBuilder
 import net.dv8tion.jda.internal.utils.Checks
 import java.awt.Color
@@ -71,6 +72,65 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
 
     @API
     constructor(builder: EmbedBuilder) : this(builder.build())
+
+    companion object {
+        /**
+         * Get preset #1
+         * Image: https://i.imgur.com/XNrKXVu.png
+         */
+        fun getFirstPreset(
+            title: String? = null,
+            color: Color? = null,
+            cmd: String? = null,
+            user: User? = null,
+            fields: List<Field> = emptyList()
+        ): KotlinEmbedBuilder {
+            val builder = KotlinEmbedBuilder()
+            builder.setAuthorSafe(user?.asTag, null, user?.avatarUrl)
+            builder.setCurrentTimestamp()
+            builder.setColor(color)
+            builder.setFooter(cmd)
+            builder.title = title
+            builder.fields.addAll(fields)
+            return builder
+        }
+
+        /**
+         * Get preset #1
+         * Images: https://imgur.com/a/ozADBCe
+         */
+        fun getSecondPreset(
+            aboveTitle: String? = null,
+            title: String? = null,
+            color: Color? = null,
+            cmd: String? = null,
+            user: User? = null,
+            showTimestamp: Boolean = true,
+            aboveTitleLink: String? = null,
+            aboveTitleImage: String? = null,
+            fields: List<Field> = emptyList()
+        ): KotlinEmbedBuilder {
+            val builder = KotlinEmbedBuilder()
+            builder.setAuthorSafe(aboveTitle, aboveTitleLink, aboveTitleImage)
+            builder.setFooter(when {
+                user != null && cmd != null -> "${user.asTag} • $cmd"
+                user != null && cmd == null -> user.asTag
+                user == null && cmd != null -> cmd
+                else -> null
+            })
+            if (showTimestamp) {
+                builder.setCurrentTimestamp()
+            }
+            builder.setColor(color)
+            builder.title = title
+            builder.fields.addAll(fields)
+            return builder
+        }
+
+        fun getExtensionFunction(actions: KotlinEmbedBuilder.() -> KotlinEmbedBuilder): MessageEmbed {
+            return KotlinEmbedBuilder().actions().build()
+        }
+    }
 
     fun setDescription(chars: CharSequence? = null): KotlinEmbedBuilder {
         description.clear()
@@ -199,22 +259,6 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
         return length
     }
 
-    fun build(): MessageEmbed {
-        check(!isEmpty()) { "Cannot build an empty embed!" }
-        check(description.length <= TEXT_MAX_LENGTH) {
-            String.format(
-                "Description is longer than %d! Please limit your input!",
-                TEXT_MAX_LENGTH
-            )
-        }
-        check(getLength() <= EMBED_MAX_LENGTH_BOT) { "Cannot build an embed with more than $EMBED_MAX_LENGTH_BOT characters!" }
-        val description: String? = if (description.isEmpty()) null else description.toString()
-        return EntityBuilder.createMessageEmbed(
-            url, title, description, EmbedType.RICH, timestamp,
-            color, thumbnail, null, author, null, footer, image, LinkedList(fields)
-        )
-    }
-
     fun addField(name: String? = null, value: String? = null, inline: Boolean): KotlinEmbedBuilder {
         if (name == null && value == null) return this
         fields.add(Field(name, value, inline))
@@ -236,6 +280,22 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
         Checks.check(
             URL_PATTERN.matches(url),
             "URL must be a valid http(s) or attachment url."
+        )
+    }
+
+    fun build(): MessageEmbed {
+        check(!isEmpty()) { "Cannot build an empty embed!" }
+        check(description.length <= TEXT_MAX_LENGTH) {
+            String.format(
+                "Description is longer than %d! Please limit your input!",
+                TEXT_MAX_LENGTH
+            )
+        }
+        check(getLength() <= EMBED_MAX_LENGTH_BOT) { "Cannot build an embed with more than $EMBED_MAX_LENGTH_BOT characters!" }
+        val description: String? = if (description.isEmpty()) null else description.toString()
+        return EntityBuilder.createMessageEmbed(
+            url, title, description, EmbedType.RICH, timestamp,
+            color, thumbnail, null, author, null, footer, image, LinkedList(fields)
         )
     }
 
@@ -276,16 +336,16 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
 
     override fun toString(): String {
         return "KotlinEmbedBuilder(" +
-                    "fields=$fields, " +
-                    "description=$description, " +
-                    "color=$color, " +
-                    "url=$url, " +
-                    "title=$title, " +
-                    "timestamp=$timestamp, " +
-                    "thumbnail=$thumbnail, " +
-                    "author=$author, " +
-                    "footer=$footer, " +
-                    "image=$image" +
+                "fields=$fields, " +
+                "description=$description, " +
+                "color=$color, " +
+                "url=$url, " +
+                "title=$title, " +
+                "timestamp=$timestamp, " +
+                "thumbnail=$thumbnail, " +
+                "author=$author, " +
+                "footer=$footer, " +
+                "image=$image" +
                 ")"
     }
 }
