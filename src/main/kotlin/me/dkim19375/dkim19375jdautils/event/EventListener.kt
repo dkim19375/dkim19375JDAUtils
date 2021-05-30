@@ -25,7 +25,6 @@
 package me.dkim19375.dkim19375jdautils.event
 
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.SCOPE
 import me.dkim19375.dkim19375jdautils.command.Command
