@@ -137,6 +137,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
      * **DOES NOT APPLY TO ANY USER BESIDES THIS**
      * @param reaction The reaction that the event should only apply to, null if it can apply to any reaction
      * @param debug True if it should print debug messages, false if not
+     * @return The UUID of the task, can be used with [getTask] and [removeTask]
      */
     @API
     open fun onReactionAdd(

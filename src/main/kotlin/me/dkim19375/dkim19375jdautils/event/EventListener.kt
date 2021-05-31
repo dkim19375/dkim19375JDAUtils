@@ -39,20 +39,20 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
     private fun getMessage(message: String, serverId: String?, guild: Boolean): MessageReceivedData? {
         val prefix: String
         if (guild) {
+            val mention = bot.jda.selfUser.asMention
+            val replacedMention = mention.replaceFirst("@", "@!")
+            val removedMention = mention.replaceFirst("@!", "@")
             if (serverId == null) {
-                if (!message.startsWith(bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!"))) {
+                if (!message.startsWith(mention.replaceFirst("@", "@!"))) {
                     return null
                 }
             }
-            prefix = if (serverId == null) bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!")
-            else if (message.startsWith(bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!"))) {
-                bot.jda.selfUser.asMention.replaceFirst("@".toRegex(), "@!")
-            } else {
-                if (message.startsWith(bot.getPrefix(serverId), ignoreCase = true)) {
-                    bot.getPrefix(serverId)
-                } else {
-                    return null
-                }
+            prefix = when {
+                serverId == null -> removedMention
+                message.startsWith(replacedMention) -> replacedMention
+                message.startsWith(removedMention) -> removedMention
+                message.startsWith(bot.getPrefix(serverId), ignoreCase = true) -> bot.getPrefix(serverId)
+                else -> return null
             }
         } else {
             prefix = bot.getPrefix(typedNull<Long>())
