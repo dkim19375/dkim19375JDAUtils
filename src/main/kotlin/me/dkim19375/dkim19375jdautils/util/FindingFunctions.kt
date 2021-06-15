@@ -50,33 +50,27 @@ private suspend fun ShardManager.retrieveUserById(id: String, cache: Boolean): U
 private suspend fun ShardManager.retrieveUserById(id: Long, cache: Boolean): User? =
     if (cache) getUserById(id) else retrieveUserById(id).await()
 
-fun JDA.findUsersBlocking(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<User> {
-    val action = CompletableFuture.completedFuture(run {
-        runBlocking {
-            findUsers(query, useShardManager, useCache)
-        }
-    })
-    return action.get()
-}
+fun JDA.findUsersBlocking(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<User> =
+    runBlocking {
+        findUsers(query, useShardManager, useCache)
+    }
 
 suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<User> {
     val userMention = USER_MENTION.matcher(query)
     val fullRefMatch = FULL_USER_REF.matcher(query)
     val manager = if (useShardManager) shardManager else null
     val cache = manager?.userCache ?: userCache
+    println("1")
     val users = if (useCache) {
         cache.asList()
     } else {
-        manager?.guilds
-            ?.map(Guild::loadMembers)
-            ?.map { it.await() }
-            ?.combine()
-            ?.map(Member::getUser)
-            ?: guilds.map(Guild::loadMembers)
-                .map { it.await() }
-                .combine()
-                .map(Member::getUser)
+        (manager?.guilds ?: guilds)
+            .map(Guild::loadMembers)
+            .map { it.await() }
+            .combine()
+            .map(Member::getUser)
     }
+    println("2")
     when {
         userMention.matches() -> {
             val user =
@@ -100,6 +94,7 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
             if (user != null) return listOf(user)
         }
     }
+    println("3")
     val exact = mutableListOf<User>()
     val wrongcase = mutableListOf<User>()
     val startswith = mutableListOf<User>()
@@ -114,6 +109,7 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
             name.lowercase().contains(lowerquery) && startswith.isEmpty() -> contains.add(user)
         }
     }
+    println("4")
     return when {
         exact.isNotEmpty() -> exact
         wrongcase.isNotEmpty() -> wrongcase
@@ -551,8 +547,14 @@ suspend fun JDA.findEmotes(query: String, useShardManager: Boolean = false, useC
         emoteCache.asList()
     } else {
         guilds
-            .map(Guild::retrieveEmotes)
-            .map { it.await() }
+            .mapNotNull(Guild::retrieveEmotes)
+            .mapNotNull {
+                try {
+                    it.await()
+                } catch (t: Throwable) {
+                    null
+                }
+            }
             .combine()
             .map {
                 it as Emote
