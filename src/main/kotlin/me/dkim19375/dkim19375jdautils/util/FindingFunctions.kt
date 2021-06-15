@@ -28,6 +28,7 @@ package me.dkim19375.dkim19375jdautils.util
 
 import dev.minn.jda.ktx.await
 import kotlinx.coroutines.runBlocking
+import me.dkim19375.dkimcore.extension.combine
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException

@@ -24,7 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.embed
 
-import me.dkim19375.dkim19375jdautils.annotation.API
+import me.dkim19375.dkimcore.annotation.API
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.EmbedType
 import net.dv8tion.jda.api.entities.MessageEmbed

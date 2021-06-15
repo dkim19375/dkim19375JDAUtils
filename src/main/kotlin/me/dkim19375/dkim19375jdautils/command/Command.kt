@@ -25,10 +25,10 @@
 package me.dkim19375.dkim19375jdautils.command
 
 import me.dkim19375.dkim19375jdautils.BotBase
-import me.dkim19375.dkim19375jdautils.annotation.API
 import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkim19375jdautils.embed.EmbedUtils
 import me.dkim19375.dkim19375jdautils.embed.KotlinEmbedBuilder
+import me.dkim19375.dkimcore.annotation.API
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent

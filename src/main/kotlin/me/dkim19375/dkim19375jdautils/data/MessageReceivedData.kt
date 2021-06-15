@@ -24,7 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.data
 
-import me.dkim19375.dkim19375jdautils.annotation.API
+import me.dkim19375.dkimcore.annotation.API
 
 @API
 class MessageReceivedData(

@@ -24,7 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.impl
 
-import me.dkim19375.dkim19375jdautils.annotation.API
+import me.dkim19375.dkimcore.annotation.API
 
 @API
 data class EntryImpl<K, V>(override val key: K, override var value: V) : MutableMap.MutableEntry<K, V> {

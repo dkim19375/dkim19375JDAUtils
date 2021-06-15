@@ -13,7 +13,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.8.5'
+version '2.8.6'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -40,6 +40,8 @@ repositories {
     maven { url = 'https://jitpack.io' }
     maven { url = 'https://m2.dv8tion.net/releases' }
     maven { url = 'https://repo.mattstudios.me/artifactory/public' }
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/releases/' }
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 dependencies {
@@ -51,6 +53,7 @@ dependencies {
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.0'
+    api 'io.github.dkim19375:dkimcore:1.0.0'
 
     testImplementation 'net.dv8tion:JDA:4.2.1_262'
     testImplementation 'commons-io:commons-io:2.8.0'
