@@ -61,7 +61,7 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
         }.toSet()
     override val type = OTHER_TYPE
     override val minArgs = 1
-    open val embed: (MessageReceivedEvent, String) -> MessageEmbed = { event, cmd ->
+    open val embed: (MessageReceivedEvent, String, CommandType) -> MessageEmbed = { event, cmd, type ->
         KotlinEmbedBuilder.getFirstPreset(
             title = "${bot.name} $name: ${type.displayname}",
             color = Color.BLUE,
@@ -107,6 +107,6 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
             sendHelpUsage(cmd, event, command)
             return
         }
-        event.channel.sendMessage(embed(event, cmd)).queue()
+        event.channel.sendMessage(embed(event, cmd, type)).queue()
     }
 }

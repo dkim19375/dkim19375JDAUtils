@@ -121,7 +121,6 @@ abstract class CustomListener {
             when (event) {
                 is PrivateMessageReceivedEvent -> command.sendHelpUsage(cmd, event)
                 is GuildMessageReceivedEvent -> command.sendHelpUsage(cmd, event)
-                is MessageReceivedEvent -> command.sendHelpUsage(cmd, event)
             }
             return false
         }

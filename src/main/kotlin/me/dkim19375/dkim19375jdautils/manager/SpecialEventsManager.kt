@@ -28,11 +28,11 @@ import dev.minn.jda.ktx.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
-import me.dkim19375.dkim19375jdautils.SCOPE
 import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkim19375jdautils.util.*
 import me.dkim19375.dkimcore.annotation.API
 import me.dkim19375.dkimcore.coroutine.ActionConsumer
+import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.extension.combine
 import me.dkim19375.dkimcore.extension.getRandomUUID
 import me.dkim19375.dkimcore.extension.removeIf

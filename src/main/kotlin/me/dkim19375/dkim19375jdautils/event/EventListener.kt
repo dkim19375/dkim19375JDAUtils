@@ -26,9 +26,9 @@ package me.dkim19375.dkim19375jdautils.event
 
 import kotlinx.coroutines.launch
 import me.dkim19375.dkim19375jdautils.BotBase
-import me.dkim19375.dkim19375jdautils.SCOPE
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkim19375jdautils.data.MessageReceivedData
+import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.extension.typedNull
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent

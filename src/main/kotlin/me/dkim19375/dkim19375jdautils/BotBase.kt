@@ -37,14 +37,13 @@ import me.dkim19375.dkim19375jdautils.event.EventListener
 import me.dkim19375.dkim19375jdautils.impl.CustomJDABuilder
 import me.dkim19375.dkim19375jdautils.manager.SpecialEventsManager
 import me.dkim19375.dkimcore.annotation.API
+import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.file.YamlFile
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.requests.GatewayIntent
 import java.util.*
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
-
-val SCOPE = CoroutineScope(Dispatchers.Default)
 
 /**
  * Bot base

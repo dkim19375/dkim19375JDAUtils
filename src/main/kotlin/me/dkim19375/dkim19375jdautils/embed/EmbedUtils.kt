@@ -40,21 +40,12 @@ object EmbedUtils {
 
     @API
     fun getEmbedGroup(name: String, values: Collection<String?>?): MessageEmbed.Field {
-        if (values.isNullOrEmpty()) {
-            return MessageEmbed.Field(name, "```\nNone ```", false)
-        }
-        var value = "```\n- "
-        var i = 1
-        for (string in values) {
-            string ?: continue
-            value = if (i == values.size) {
-                "$value$string"
+        return MessageEmbed.Field(
+            name, if (values.isNullOrEmpty()) {
+                "```\nNone ```"
             } else {
-                "$value$string\n- "
-            }
-            i++
-        }
-        value = "$value```"
-        return MessageEmbed.Field(name, value, false)
+                "```\n- ${values.filterNotNull().joinToString("\n- ")}```"
+            }, false
+        )
     }
 }
