@@ -30,7 +30,7 @@ import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.SelfUser
 import net.dv8tion.jda.api.entities.User
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -138,11 +138,35 @@ internal class WhitelistTest {
 
         assertTrue(Whitelist(permissions, null).hasAccess(user))
         assertTrue(Whitelist(permissions, setOf(USER_ID)).hasAccess(user))
-        assertTrue(Whitelist(permissions, null, ignoreWhitelist = setOf(USER_ID)).hasAccess(user))
-        assertTrue(Whitelist(permissions, setOf(USER_ID), ignoreWhitelist = setOf(USER_ID)).hasAccess(user))
-        assertTrue(Whitelist(permissions, setOf(SELF_USER_ID), ignoreWhitelist = setOf(USER_ID)).hasAccess(user))
+        assertTrue(
+            Whitelist(
+                permissions,
+                null,
+                ignore = Pair(Whitelist.IgnoreType.IGNORE_WHITELIST, setOf(USER_ID))
+            ).hasAccess(user)
+        )
+        assertTrue(
+            Whitelist(
+                permissions,
+                setOf(USER_ID),
+                ignore = Pair(Whitelist.IgnoreType.IGNORE_WHITELIST, setOf(USER_ID))
+            ).hasAccess(user)
+        )
+        assertTrue(
+            Whitelist(
+                permissions,
+                setOf(SELF_USER_ID),
+                ignore = Pair(Whitelist.IgnoreType.IGNORE_WHITELIST, setOf(USER_ID))
+            ).hasAccess(user)
+        )
         assertFalse(Whitelist(permissions, setOf(SELF_USER_ID)).hasAccess(user))
-        assertFalse(Whitelist(permissions, setOf(SELF_USER_ID), ignoreWhitelist = setOf(SELF_USER_ID)).hasAccess(user))
+        assertFalse(
+            Whitelist(
+                permissions,
+                setOf(SELF_USER_ID),
+                ignore = Pair(Whitelist.IgnoreType.IGNORE_WHITELIST, setOf(SELF_USER_ID))
+            ).hasAccess(user)
+        )
     }
 
     @Test
@@ -157,9 +181,9 @@ internal class WhitelistTest {
         val permissions = mutableSetOf(Permission.VIEW_CHANNEL)
 
         `when`(selfUser.jda).thenReturn(jda)
-        assertFalse(Whitelist(permissions, setOf(), ignoreWhitelistBots = true).hasAccess(user))
-        assertTrue(Whitelist(permissions, setOf(USER_ID), ignoreWhitelistBots = true).hasAccess(user))
-        assertTrue(Whitelist(permissions, setOf(), ignoreWhitelistBots = true).hasAccess(selfUser))
+        assertFalse(Whitelist(permissions, setOf(), ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST).hasAccess(user))
+        assertTrue(Whitelist(permissions, setOf(USER_ID), ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST).hasAccess(user))
+        assertTrue(Whitelist(permissions, setOf(), ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST).hasAccess(selfUser))
         assertFalse(Whitelist(permissions, setOf()).hasAccess(selfUser))
         assertTrue(Whitelist(permissions, setOf(SELF_USER_ID)).hasAccess(selfUser))
     }

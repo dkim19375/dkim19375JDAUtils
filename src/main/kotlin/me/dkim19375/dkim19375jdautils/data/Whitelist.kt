@@ -38,7 +38,7 @@ import net.dv8tion.jda.api.entities.User
  * @property permissions Permissions required
  * @property whitelist If it is not null, then the user's id must be in the [Set<Long>][Set]
  * @property blacklist The user's id must not be in the [Set<Long>][Set]
- * @property ignoreWhitelist Ignores whitelist rules
+ * @property ignore Ignores whitelist rules
  * @property ignoreWhitelistBots Makes bots ignore whitelist rules
  * @property ignoreWhitelistSelf Makes self user ignore whitelist rules
  * @constructor Creates an empty whitelist instance
@@ -47,15 +47,29 @@ data class Whitelist(
     val permissions: Set<Permission> = emptySet(),
     val whitelist: Set<Long>? = null,
     val blacklist: Set<Long> = emptySet(),
-    val ignoreWhitelist: Set<Long> = emptySet(),
-    val ignoreWhitelistBots: Boolean = false,
-    val ignoreWhitelistSelf: Boolean = false
+    val ignore: Pair<IgnoreType, Set<Long>> = Pair(IgnoreType.IGNORE_WHITELIST, emptySet()),
+    val ignoreWhitelistBots: IgnoreType? = null,
+    val ignoreWhitelistSelf: IgnoreType? = null
 ) {
     fun hasAccess(
         user: User,
         member: Member? = null,
         channel: GuildChannel? = null
     ): Boolean {
+        val isSelf = user.idLong == user.jda.selfUser.idLong
+        val ignoreType = ignore.first
+        val ignore = ignore.second
+        if (ignore.contains(user.idLong) && ignoreType == IgnoreType.IGNORE_ALL) {
+            return true
+        }
+        if (ignoreWhitelistBots == IgnoreType.IGNORE_ALL && user.isBot) {
+            return true
+        }
+        if (ignoreWhitelistSelf == IgnoreType.IGNORE_ALL && isSelf) {
+            return true
+        }
+        val ignoreWhitelistBots = ignoreWhitelistBots != null
+        val ignoreWhitelistSelf = ignoreWhitelistSelf != null
         if (member != null) {
             if (!member.hasPermission(permissions, channel)) {
                 return false
@@ -63,13 +77,25 @@ data class Whitelist(
         }
         if (
             (whitelist != null) // checks if whitelist is not null
-            && (!ignoreWhitelist.contains(user.idLong)) // checks if the user is in the bypass whitelist
+            && (!ignore.contains(user.idLong)) // checks if the user is in the bypass whitelist
             && (!(user.isBot && ignoreWhitelistBots)) // checks if the user is a bot and is in the bypass whitelist
-            && (!((user.idLong == user.jda.selfUser.idLong) && ignoreWhitelistSelf)) // checks if the user is self and is in the bypass whitelist
+            && (!(isSelf && ignoreWhitelistSelf)) // checks if the user is self and is in the bypass whitelist
             && (!whitelist.contains(user.idLong)) // checks if the user is not in the whitelist
         ) {
             return false
         }
         return !blacklist.contains(user.idLong)
+    }
+
+    enum class IgnoreType {
+        /**
+         * Always returns true, ignores the entire whitelist, even if they don't have permissions
+         */
+        IGNORE_ALL,
+
+        /**
+         * Ignores only the whitelist, will return false if users do not have permission
+         */
+        IGNORE_WHITELIST
     }
 }
