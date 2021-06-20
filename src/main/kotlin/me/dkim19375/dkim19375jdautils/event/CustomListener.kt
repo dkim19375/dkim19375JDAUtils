@@ -26,6 +26,7 @@ package me.dkim19375.dkim19375jdautils.event
 
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkimcore.annotation.API
+import me.dkim19375.dkimcore.extension.containsIgnoreCase
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -99,7 +100,7 @@ abstract class CustomListener {
         channel: MessageChannel,
         event: Event
     ): Boolean {
-        if (!cmd.equals(command.command, ignoreCase = true)) {
+        if (!command.aliases.plus(command.command).containsIgnoreCase(cmd)) {
             return false
         }
         if (user.isBot && antiBot) {
