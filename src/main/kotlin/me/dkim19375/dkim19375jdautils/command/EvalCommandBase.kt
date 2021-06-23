@@ -24,10 +24,10 @@
 
 package me.dkim19375.dkim19375jdautils.command
 
+import dev.minn.jda.ktx.await
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.data.Whitelist
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -108,11 +108,35 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         }
         val output = strWriter.toString().replace("`", "`\u200B")
         val error = errorWriter.toString().replace("`", "`\u200B")
-        event.channel.sendMessage(
-            "Result: ${if (result.isEmpty()) "Nothing\n" else "```$result```"}" +
-                    "Output: ${if (output.isEmpty()) "Nothing\n" else "```$output```"}" +
-                    if (error.isEmpty()) "" else "Error: ```$error```" +
-                            "Took ${time}ms"
-        ).queue()
+        val messages = mutableListOf<String>()
+        messages.addAll(splitStrSizes("Result: ", "Result: Nothing\n", result))
+        messages.addAll(splitStrSizes("Output: ", "Output: Nothing\n", output))
+        messages.addAll(splitStrSizes("Error: ", "", error))
+        messages.add("Took ${time}ms")
+        val new = messages.fold(listOf<String>()) fold@{ accumulator, element ->
+            if (accumulator.lastOrNull()?.length?.plus(element.length) ?: 2000 < 2000) {
+                val new = accumulator.toMutableList()
+                val value = new.removeLast()
+                new.add(value + element)
+                return@fold new
+            } else {
+                return@fold accumulator.plus(element)
+            }
+        }
+        new.forEach {
+            event.channel.sendMessage(it).await()
+        }
+    }
+
+    private fun splitStrSizes(beginning: String, empty: String, str: String): List<String> {
+        if (str.isEmpty()) {
+            return listOf(empty)
+        }
+        var first = true
+        return str.chunked(1990 - beginning.length) text@{
+            val value = "${if (first) beginning else ""}```$it```"
+            first = false
+            return@text value
+        }
     }
 }
