@@ -28,10 +28,7 @@ import dev.minn.jda.ktx.injectKTX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import me.dkim19375.dkim19375jdautils.command.Command
-import me.dkim19375.dkim19375jdautils.command.CommandType
-import me.dkim19375.dkim19375jdautils.command.HelpCommand
-import me.dkim19375.dkim19375jdautils.command.OTHER_TYPE
+import me.dkim19375.dkim19375jdautils.command.*
 import me.dkim19375.dkim19375jdautils.event.CustomListener
 import me.dkim19375.dkim19375jdautils.event.EventListener
 import me.dkim19375.dkim19375jdautils.impl.CustomJDABuilder
@@ -105,12 +102,12 @@ abstract class BotBase {
     /**
      * [CommandTypes][me.dkim19375.dkim19375jdautils.command.CommandType] that should be registered
      */
-    open val commandTypes = mutableSetOf(OTHER_TYPE)
+    open val commandTypes = mutableSetOf(CommandType.OTHER, CommandType.UTILITIES)
 
     /**
      * [Commands][Command] that should be registered
      */
-    open val commands = mutableSetOf<Command>(HelpCommand(this))
+    open val commands = mutableSetOf(HelpCommand(this), EvalCommandBase(this))
 
     /**
      * A [Set] of [YamlFiles][YamlFile] to register

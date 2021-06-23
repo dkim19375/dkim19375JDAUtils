@@ -39,4 +39,9 @@ fun String.getCommandType(bot: BotBase): CommandType? {
     return null
 }
 
-abstract class CommandType(open val name: String, open val displayname: String = StringUtils.capitalize(name.lowercase()))
+abstract class CommandType(open val name: String, open val displayname: String = StringUtils.capitalize(name.lowercase())) {
+    companion object {
+        val UTILITIES: CommandType = object : CommandType("UTILITIES", "Utilities") {}
+        val OTHER: CommandType = object : CommandType("OTHER", "Other") {}
+    }
+}

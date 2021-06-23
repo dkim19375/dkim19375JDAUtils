@@ -35,8 +35,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 
-val OTHER_TYPE: CommandType = object : CommandType("OTHER", "Other") {}
-
 /**
  * A default (optional) help command.
  *
@@ -59,7 +57,7 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
                 "View commands in the ${type.displayname.lowercase()} category"
             )
         }.toSet()
-    override val type = OTHER_TYPE
+    override val type = CommandType.OTHER
     override val minArgs = 1
     open val embed: (MessageReceivedEvent, String, CommandType) -> MessageEmbed = { event, cmd, type ->
         KotlinEmbedBuilder.getFirstPreset(
