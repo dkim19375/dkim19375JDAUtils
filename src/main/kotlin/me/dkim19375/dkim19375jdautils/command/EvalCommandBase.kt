@@ -26,6 +26,7 @@ package me.dkim19375.dkim19375jdautils.command
 
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.data.Whitelist
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl
 import java.io.PrintWriter
@@ -38,6 +39,7 @@ private val codeBlock = Regex("```(?:(?<lang>[a-zA-Z]+)?\\n)?((?:.|\\n)*?)```")
 
 open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
     override val aliases: Set<String> = setOf("eval")
+
     @Suppress("LeakingThis")
     override val arguments: Set<CommandArg> = setOf(CommandArg(this, "<code>", "The code to run"))
     override val command: String = "evaluate"
@@ -47,14 +49,14 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
     override val type: CommandType = CommandType.UTILITIES
     override val permissions: Whitelist = Whitelist(whitelist = setOf(521485088995672084L))
     open val imports: Set<String> = emptySet()
-    open val variables: Map<String, Any> = emptyMap()
+    open val variables: (MessageReceivedEvent) -> Map<String, Any> = { emptyMap() }
 
-    override suspend fun onGuildCommand(
+    override suspend fun onCommand(
         cmd: String,
         args: List<String>,
         prefix: String,
         all: String,
-        event: GuildMessageReceivedEvent
+        event: MessageReceivedEvent
     ) {
         val engine: ScriptEngine = GroovyScriptEngineImpl()
         val imports = setOf(
@@ -85,7 +87,7 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         variables["selfUser"] = event.jda.selfUser
         variables["bot"] = bot
 
-        variables.plus(this.variables).forEach(engine::put)
+        variables.plus(this.variables(event)).forEach(engine::put)
 
         val strWriter = StringWriter()
         val printWriter = PrintWriter(strWriter)
@@ -100,7 +102,7 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
             result = try {
                 engine.eval(code)?.toString() ?: ""
             } catch (e: ScriptException) {
-                event.channel.sendMessage("ERROR: ${e.localizedMessage}").queue()
+                event.channel.sendMessage("ERROR: ```\n${e.localizedMessage.replace("`", "`\u200B")}```").queue()
                 return
             }.replace("`", "`\u200B")
         }
@@ -110,7 +112,7 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
             "Result: ${if (result.isEmpty()) "Nothing\n" else "```$result```"}" +
                     "Output: ${if (output.isEmpty()) "Nothing\n" else "```$output```"}" +
                     if (error.isEmpty()) "" else "Error: ```$error```" +
-                    "Took ${time}ms"
+                            "Took ${time}ms"
         ).queue()
     }
 }
