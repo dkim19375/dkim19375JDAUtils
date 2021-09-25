@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
     id 'org.jetbrains.dokka' version '1.4.32'
     id 'net.minecrell.licenser' version '0.4.1'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.30'
     id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
 }
 
@@ -13,7 +13,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.9.2'
+version '2.9.3'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -27,8 +27,8 @@ compileTestKotlin.kotlinOptions {
 }
 
 license {
-    header = rootProject.file("LICENSE")
-    include "**/*.kt"
+    header = rootProject.file 'LICENSE'
+    include '**/*.kt'
 }
 
 test {
@@ -46,28 +46,28 @@ repositories {
 
 dependencies {
     compileOnly 'net.dv8tion:JDA:4.2.1_262'
-    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.10'
-    api 'commons-io:commons-io:2.8.0'
+    api 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.30'
+    api 'commons-io:commons-io:2.11.0'
     api 'org.apache.commons:commons-lang3:3.12.0'
     api 'com.github.minndevelopment:jda-ktx:0.4.0'
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.0'
-    api 'io.github.dkim19375:dkimcore:1.0.2'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.2'
+    api 'io.github.dkim19375:dkimcore:1.1.12'
     api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
     testImplementation 'net.dv8tion:JDA:4.2.1_262'
-    testImplementation 'commons-io:commons-io:2.8.0'
+    testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
     testImplementation 'com.github.minndevelopment:jda-ktx:0.4.0'
     testImplementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
 
     // testing libs
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test:1.5.21'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
     testImplementation 'org.mockito.kotlin:mockito-kotlin:3.2.0'
 }
 
@@ -152,22 +152,18 @@ publishing {
 }
 
 nexusPublishing {
-    packageGroup.set("io.github.dkim19375")
+    packageGroup.set 'io.github.dkim19375'
     repositories {
         sonatype {
-            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
-            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            username = project.findProperty("mavenUsername")
-            password = project.findProperty("mavenPassword")
+            nexusUrl = uri 'https://s01.oss.sonatype.org/service/local/'
+            snapshotRepositoryUrl = uri 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            username = project.findProperty 'mavenUsername'
+            password = project.findProperty 'mavenPassword'
         }
     }
 }
 
 signing {
-/*    def keyId = findProperty("signingKeyId")
-    def key = findProperty("signingKey")
-    def pass = findProperty("signingPassword")
-    useInMemoryPgpKeys(keyId, key, pass)*/
     sign publishing.publications.mavenJava
 }
 

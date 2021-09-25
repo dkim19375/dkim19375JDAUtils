@@ -25,15 +25,17 @@
 package me.dkim19375.dkim19375jdautils
 
 import dev.minn.jda.ktx.injectKTX
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import me.dkim19375.dkim19375jdautils.command.*
+import me.dkim19375.dkim19375jdautils.command.Command
+import me.dkim19375.dkim19375jdautils.command.CommandType
+import me.dkim19375.dkim19375jdautils.command.EvalCommandBase
+import me.dkim19375.dkim19375jdautils.command.HelpCommand
 import me.dkim19375.dkim19375jdautils.event.CustomListener
 import me.dkim19375.dkim19375jdautils.event.EventListener
 import me.dkim19375.dkim19375jdautils.impl.CustomJDABuilder
 import me.dkim19375.dkim19375jdautils.manager.SpecialEventsManager
 import me.dkim19375.dkimcore.annotation.API
+import me.dkim19375.dkimcore.extension.IO_SCOPE
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.file.YamlFile
 import net.dv8tion.jda.api.JDA
@@ -50,7 +52,6 @@ import kotlin.system.exitProcess
 @API
 @Suppress("LeakingThis")
 abstract class BotBase {
-    private val ioScope = CoroutineScope(Dispatchers.IO)
     /**
      * The name of the bot
      */
@@ -159,10 +160,11 @@ abstract class BotBase {
     }
 
     /**
+     * @param consoleCommandsEnabled True if console commands should be enabled, false if not
      * @param stopCommandEnabled True if the stop console command should be enabled, false if not
      */
     @API
-    fun onStart(stopCommandEnabled: Boolean = true) {
+    open fun onStart(consoleCommandsEnabled: Boolean = true, stopCommandEnabled: Boolean = true) {
         if (started) {
             return
         }
@@ -177,7 +179,10 @@ abstract class BotBase {
                 println("Stopped")
             }
         })
-        ioScope.launch {
+        if (!consoleCommandsEnabled) {
+            return
+        }
+        IO_SCOPE.launch {
             val scanner = Scanner(System.`in`)
             while (scanner.hasNext()) {
                 val next = scanner.nextLine()
