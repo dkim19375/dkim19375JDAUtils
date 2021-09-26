@@ -41,6 +41,8 @@ import me.dkim19375.dkimcore.file.YamlFile
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.requests.GatewayIntent
 import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
@@ -160,11 +162,14 @@ abstract class BotBase {
     }
 
     /**
-     * @param consoleCommandsEnabled True if console commands should be enabled, false if not
      * @param stopCommandEnabled True if the stop console command should be enabled, false if not
      */
     @API
-    open fun onStart(consoleCommandsEnabled: Boolean = true, stopCommandEnabled: Boolean = true) {
+    open fun onStart(
+        stopCommandEnabled: Boolean = true,
+        await: Boolean = false,
+        executorService: ExecutorService? = Executors.newSingleThreadExecutor()
+    ) {
         if (started) {
             return
         }
@@ -179,10 +184,10 @@ abstract class BotBase {
                 println("Stopped")
             }
         })
-        if (!consoleCommandsEnabled) {
-            return
+        if (await) {
+            jda.awaitReady()
         }
-        IO_SCOPE.launch {
+        executorService?.submit {
             val scanner = Scanner(System.`in`)
             while (scanner.hasNext()) {
                 val next = scanner.nextLine()
