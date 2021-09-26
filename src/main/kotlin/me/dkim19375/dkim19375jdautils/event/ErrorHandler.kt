@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 dkim19375
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package me.dkim19375.dkim19375jdautils.event
 
 import me.dkim19375.dkim19375jdautils.command.Command
@@ -8,12 +32,12 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent
 
 open class ErrorHandler {
 
-    open fun onMessageReceived(error: Throwable, event: MessageReceivedEvent, command: Command) {
+    open suspend fun onMessageReceived(error: Throwable, event: MessageReceivedEvent, command: Command) {
         error.printStackTrace()
         event.channel.sendMessage("An internal error has occurred!").queue()
     }
 
-    open fun onMessageReceivedCommand(
+    open suspend fun onMessageReceivedCommand(
         error: Throwable,
         event: MessageReceivedEvent,
         command: Command,
@@ -24,12 +48,12 @@ open class ErrorHandler {
     }
 
 
-    open fun onGuildMessageReceived(error: Throwable, event: GuildMessageReceivedEvent, command: Command) {
+    open suspend fun onGuildMessageReceived(error: Throwable, event: GuildMessageReceivedEvent, command: Command) {
         error.printStackTrace()
         event.channel.sendMessage("An internal error has occurred!").queue()
     }
 
-    open fun onGuildMessageReceivedCommand(
+    open suspend fun onGuildMessageReceivedCommand(
         error: Throwable,
         event: GuildMessageReceivedEvent,
         command: Command,
@@ -40,12 +64,12 @@ open class ErrorHandler {
     }
 
 
-    open fun onPrivateMessageReceived(error: Throwable, event: PrivateMessageReceivedEvent, command: Command) {
+    open suspend fun onPrivateMessageReceived(error: Throwable, event: PrivateMessageReceivedEvent, command: Command) {
         error.printStackTrace()
         event.channel.sendMessage("An internal error has occurred!").queue()
     }
 
-    open fun onPrivateMessageReceivedCommand(
+    open suspend fun onPrivateMessageReceivedCommand(
         error: Throwable,
         event: PrivateMessageReceivedEvent,
         command: Command,
