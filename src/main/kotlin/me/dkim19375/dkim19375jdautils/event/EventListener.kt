@@ -80,13 +80,12 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         if (!bot.customListener.onMessageReceived(event)) {
             return
         }
-        bot.sendEvent { c ->
+        bot.sendEvent { command ->
             SCOPE.launch {
                 try {
-                    c.onMessageReceived(event.message.contentRaw, event)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    event.channel.sendMessage("An internal error has occurred!").queue()
+                    command.onMessageReceived(event.message.contentRaw, event)
+                } catch (e: Throwable) {
+                    bot.errorHandler.onMessageReceived(e, event, command)
                 }
             }
         }
@@ -99,16 +98,15 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
             event.isFromGuild
         )
         if (msg != null) {
-            bot.sendEvent { c ->
+            bot.sendEvent { command ->
                 SCOPE.launch {
-                    if (!isValid(c, msg.command, msg.args.toList(), event)) {
+                    if (!isValid(command, msg.command, msg.args.toList(), event)) {
                         return@launch
                     }
                     try {
-                        c.onCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
+                        command.onCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
                     } catch (e: Exception) {
-                        e.printStackTrace()
-                        event.channel.sendMessage("An internal error has occurred!").queue()
+                        bot.errorHandler.onMessageReceivedCommand(e, event, command, msg)
                     }
                 }
             }
@@ -119,28 +117,26 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         if (!bot.customListener.onGuildMessageReceived(event)) {
             return
         }
-        bot.sendEvent { c ->
+        bot.sendEvent { command ->
             SCOPE.launch {
                 try {
-                    c.onGuildMessageReceived(event.message.contentRaw, event)
+                    command.onGuildMessageReceived(event.message.contentRaw, event)
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    event.channel.sendMessage("An internal error has occurred!").queue()
+                    bot.errorHandler.onGuildMessageReceived(e, event, command)
                 }
             }
         }
         val msg = getMessage(event.message.contentRaw, event.guild.id, true)
         if (msg != null) {
-            bot.sendEvent { c ->
+            bot.sendEvent { command ->
                 SCOPE.launch {
-                    if (!isValid(c, msg.command, msg.args.toList(), event)) {
+                    if (!isValid(command, msg.command, msg.args.toList(), event)) {
                         return@launch
                     }
                     try {
-                        c.onGuildCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
+                        command.onGuildCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
                     } catch (e: Exception) {
-                        e.printStackTrace()
-                        event.channel.sendMessage("An internal error has occurred!").queue()
+                        bot.errorHandler.onGuildMessageReceivedCommand(e, event, command, msg)
                     }
                 }
             }
@@ -151,35 +147,28 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         if (!bot.customListener.onPrivateMessageReceived(event)) {
             return
         }
-        bot.sendEvent { c ->
+        bot.sendEvent { command ->
             SCOPE.launch {
                 try {
-                    c.onPrivateMessageReceived(event.message.contentRaw, event)
+                    command.onPrivateMessageReceived(event.message.contentRaw, event)
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    event.channel.sendMessage("An internal error has occurred!").queue()
+                    bot.errorHandler.onPrivateMessageReceived(e, event, command)
                 }
             }
         }
         val msg = getMessage(event.message.contentRaw, null, false)
         if (msg != null) {
-            try {
-                bot.sendEvent { c ->
-                    SCOPE.launch {
-                        if (!isValid(c, msg.command, msg.args.toList(), event)) {
-                            return@launch
-                        }
-                        try {
-                            c.onPrivateCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            event.channel.sendMessage("An internal error has occurred!").queue()
-                        }
+            bot.sendEvent { command ->
+                SCOPE.launch {
+                    if (!isValid(command, msg.command, msg.args.toList(), event)) {
+                        return@launch
+                    }
+                    try {
+                        command.onPrivateCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
+                    } catch (e: Exception) {
+                        bot.errorHandler.onPrivateMessageReceivedCommand(e, event, command, msg)
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                event.channel.sendMessage("An internal error has occurred!").queue()
             }
         }
     }
@@ -190,15 +179,15 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         args: List<String>,
         event: GuildMessageReceivedEvent
     ): Boolean = bot.customListener.isValid(
-        command,
-        cmd,
-        args,
-        event.member,
-        event.author,
-        event.guild,
-        event.message,
-        event.channel,
-        event
+        command = command,
+        cmd = cmd,
+        args = args,
+        member = event.member,
+        user = event.author,
+        guild = event.guild,
+        message = event.message,
+        channel = event.channel,
+        event = event
     )
 
     private fun isValid(
@@ -207,11 +196,19 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         args: List<String>,
         event: MessageReceivedEvent
     ): Boolean = bot.customListener.isValid(
-        command, cmd, args, event.member, event.author, try {
+        command = command,
+        cmd = cmd,
+        args = args,
+        member = event.member,
+        user = event.author,
+        guild = try {
             event.guild
         } catch (_: IllegalStateException) {
             null
-        }, event.message, event.channel, event
+        },
+        message = event.message,
+        channel = event.channel,
+        event = event
     )
 
     private fun isValid(
@@ -220,14 +217,14 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         args: List<String>,
         event: PrivateMessageReceivedEvent
     ): Boolean = bot.customListener.isValid(
-        command,
-        cmd,
-        args,
-        null,
-        event.author,
-        null,
-        event.message,
-        event.channel,
-        event
+        command = command,
+        cmd = cmd,
+        args = args,
+        member = null,
+        user = event.author,
+        guild = null,
+        message = event.message,
+        channel = event.channel,
+        event = event
     )
 }

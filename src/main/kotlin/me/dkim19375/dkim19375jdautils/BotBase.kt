@@ -31,6 +31,7 @@ import me.dkim19375.dkim19375jdautils.command.CommandType
 import me.dkim19375.dkim19375jdautils.command.EvalCommandBase
 import me.dkim19375.dkim19375jdautils.command.HelpCommand
 import me.dkim19375.dkim19375jdautils.event.CustomListener
+import me.dkim19375.dkim19375jdautils.event.ErrorHandler
 import me.dkim19375.dkim19375jdautils.event.EventListener
 import me.dkim19375.dkim19375jdautils.impl.CustomJDABuilder
 import me.dkim19375.dkim19375jdautils.manager.SpecialEventsManager
@@ -80,6 +81,11 @@ abstract class BotBase {
         return@builder builder.enableIntents(intents)
             .addEventListeners(eventsManager, EventListener(this))
     }
+
+    /**
+     * Allows you to handle command errors
+     */
+    open val errorHandler: ErrorHandler = ErrorHandler()
 
     /**
      * Allows you to run methods on [CustomJDABuilder], overriding the ones ran by the [BotBase#onStart][BotBase.onStart]
