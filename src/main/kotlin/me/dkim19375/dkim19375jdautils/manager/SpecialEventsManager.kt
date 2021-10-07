@@ -122,7 +122,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
      * Called when a user adds a reaction, based off of [MessageReactionAddEvent]
      *
      * @param permanent True if the event should be called permanently,
-     * false if should be no longer called again once called
+     * false if the event should no longer called again once called
      * @param eventType The [EventType] of when this event should be called
      * @param action The Action of what should happen on event.
      *
@@ -147,7 +147,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     open fun onReactionAdd(
         permanent: Boolean,
         eventType: EventType,
-        action: (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?, UUID) -> Boolean,
+        action: suspend (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?, UUID) -> Boolean,
         requiredMessage: Long = 0,
         requiredChannel: Long = 0,
         requiredGuild: Long = 0,
@@ -196,7 +196,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     protected open suspend fun onReactionAddCoroutine(
         permanent: Boolean,
         eventType: EventType,
-        action: (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?, UUID) -> Boolean,
+        action: suspend (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?, UUID) -> Boolean,
         requiredMessage: Long = 0,
         requiredChannel: Long = 0,
         requiredGuild: Long = 0,
