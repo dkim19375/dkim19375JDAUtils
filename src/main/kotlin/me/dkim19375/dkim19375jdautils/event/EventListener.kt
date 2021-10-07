@@ -76,6 +76,7 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         return MessageReceivedData(command, argsList, prefix, message)
     }
 
+    @Suppress("DEPRECATION")
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (!bot.customListener.onMessageReceived(event)) {
             return

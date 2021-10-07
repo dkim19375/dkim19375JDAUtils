@@ -60,7 +60,6 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
     val fullRefMatch = FULL_USER_REF.matcher(query)
     val manager = if (useShardManager) shardManager else null
     val cache = manager?.userCache ?: userCache
-    println("1")
     val users = if (useCache) {
         cache.asList()
     } else {
@@ -70,7 +69,6 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
             .combine()
             .map(Member::getUser)
     }
-    println("2")
     when {
         userMention.matches() -> {
             val user =
@@ -94,7 +92,6 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
             if (user != null) return listOf(user)
         }
     }
-    println("3")
     val exact = mutableListOf<User>()
     val wrongcase = mutableListOf<User>()
     val startswith = mutableListOf<User>()
@@ -109,7 +106,6 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
             name.lowercase().contains(lowerquery) && startswith.isEmpty() -> contains.add(user)
         }
     }
-    println("4")
     return when {
         exact.isNotEmpty() -> exact
         wrongcase.isNotEmpty() -> wrongcase

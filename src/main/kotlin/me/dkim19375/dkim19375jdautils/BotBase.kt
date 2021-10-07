@@ -116,7 +116,7 @@ abstract class BotBase {
     /**
      * [Commands][Command] that should be registered
      */
-    open val commands = mutableSetOf(HelpCommand(this), EvalCommandBase(this))
+    open val commands = mutableSetOf<Command>()
 
     /**
      * A [Set] of [YamlFiles][YamlFile] to register

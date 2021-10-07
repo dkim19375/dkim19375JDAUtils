@@ -27,16 +27,18 @@ package me.dkim19375.dkim19375jdautils.command
 import dev.minn.jda.ktx.await
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.data.Whitelist
+import me.dkim19375.dkimcore.annotation.API
+import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl
 import java.io.PrintWriter
 import java.io.StringWriter
-import javax.script.ScriptEngine
-import javax.script.ScriptException
+import javax.script.ScriptEngineManager
 import kotlin.system.measureTimeMillis
+
 
 private val codeBlock = Regex("```(?:(?<lang>[a-zA-Z]+)?\\n)?((?:.|\\n)*?)```")
 
+@API
 open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
     override val aliases: Set<String> = setOf("eval")
 
@@ -51,6 +53,7 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
     open val imports: Set<String> = emptySet()
     open val variables: (MessageReceivedEvent) -> Map<String, Any> = { emptyMap() }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun onCommand(
         cmd: String,
         args: List<String>,
@@ -58,7 +61,8 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         all: String,
         event: MessageReceivedEvent
     ) {
-        val engine: ScriptEngine = GroovyScriptEngineImpl()
+        val factory = ScriptEngineManager()
+        val engine = factory.getEngineByName("nashorn")
         val imports = setOf(
             "net.dv8tion.jda.api.entities.impl",
             "net.dv8tion.jda.api.managers",
@@ -70,14 +74,18 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
             "java.util",
             "java.util.concurrent",
             "java.time"
-        ).plus(this.imports).joinToString("; ") { "import $it.*" }
-        val code = "$imports\n${
+        ).plus(this.imports)
+        val packages = imports.filter { import -> runCatchingOrNull { Class.forName(import) } == null }
+        val classes = imports - packages
+        val importStr = "with (new JavaImporter(${packages.joinToString(transform = { "Packages.$it" })})) { ${classes.joinToString { import ->
+            "var ${import.split('.').last()} = Java.Type(\"$import\"); "
+        }}"
+        val code = "$importStr${
             codeBlock.findAll(args.joinToString(" "))
                 .map { it.groups.last()?.value }
                 .filterNotNull()
                 .firstOrNull() ?: args.joinToString(" ")
-        }"
-
+        }}"
         val variables = mutableMapOf<String, Any>()
         variables["jda"] = event.jda
         variables["event"] = event
@@ -87,7 +95,7 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         variables["selfUser"] = event.jda.selfUser
         variables["bot"] = bot
 
-        variables.plus(this.variables(event)).forEach(engine::put)
+        variables.plus(variables(event)).forEach(engine::put)
 
         val strWriter = StringWriter()
         val printWriter = PrintWriter(strWriter)
@@ -101,8 +109,9 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         val time = measureTimeMillis {
             result = try {
                 engine.eval(code)?.toString() ?: ""
-            } catch (e: ScriptException) {
-                event.channel.sendMessage("ERROR: ```\n${e.localizedMessage.replace("`", "`\u200B")}```").queue()
+            } catch (error: Throwable) {
+                error.printStackTrace()
+                event.channel.sendMessage("ERROR: ```\n${error.localizedMessage.replace("`", "`\u200B")}```").queue()
                 return
             }.replace("`", "`\u200B")
         }
@@ -114,7 +123,7 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         messages.addAll(splitStrSizes("Error: ", "", error))
         messages.add("Took ${time}ms")
         val new = messages.fold(listOf<String>()) fold@{ accumulator, element ->
-            if (accumulator.lastOrNull()?.length?.plus(element.length) ?: 2000 < 2000) {
+            if ((accumulator.lastOrNull()?.length?.plus(element.length) ?: 2000) < 2000) {
                 val new = accumulator.toMutableList()
                 val value = new.removeLast()
                 new.add(value + element)
