@@ -140,6 +140,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
      * @param removeSelfIfNoPerms True if the reaction should be removed it this bot, [SelfUser] doesn't have permissions.
      * **DOES NOT APPLY TO ANY USER BESIDES THIS**
      * @param reaction The reaction that the event should only apply to, null if it can apply to any reaction
+     * @param retrieveMember Getting the [Member] requires a REST action, so if you aren't using it you should set this to false
      * @param debug True if it should print debug messages, false if not
      * @return The UUID of the task, can be used with [getTask] and [removeTask]
      */
@@ -156,6 +157,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         removeBotIfNoPerms: Boolean = false,
         removeSelfIfNoPerms: Boolean = false,
         reaction: MessageReaction.ReactionEmote? = null,
+        retrieveMember: Boolean = true,
         debug: Boolean = false
     ): UUID {
         val combined = events.keys.plus(singleEvents.values.map { a -> a.keys }.combine())
@@ -175,6 +177,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                         removeBotIfNoPerms,
                         removeSelfIfNoPerms,
                         reaction,
+                        retrieveMember,
                         debug,
                         uuid,
                         event
@@ -205,6 +208,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         removeBotIfNoPerms: Boolean = false,
         removeSelfIfNoPerms: Boolean = false,
         reaction: MessageReaction.ReactionEmote? = null,
+        retrieveMember: Boolean = true,
         debug: Boolean = false,
         uuid: UUID,
         event: Event
@@ -310,7 +314,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             println("passed requiredMessage test")
         }
         val user = jda.retrieveUserById(userId).await()
-        val member = guild?.retrieveMemberById(userId)?.await()
+        val member = if (retrieveMember) guild?.retrieveMemberById(userId)?.await() else null
         val runAction = { success: Boolean ->
             member?.let {
                 if (!success) {
