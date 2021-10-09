@@ -52,6 +52,7 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
     override val permissions: Whitelist = Whitelist(whitelist = setOf(521485088995672084L))
     open val imports: Set<String> = emptySet()
     open val variables: (MessageReceivedEvent) -> Map<String, Any> = { emptyMap() }
+    private val isBukkit = runCatchingOrNull { Class.forName("org.bukkit.Bukkit") } != null
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun onCommand(
@@ -64,22 +65,69 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         val factory = ScriptEngineManager()
         val engine = factory.getEngineByName("nashorn")
         val imports = setOf(
-            "net.dv8tion.jda.api.entities.impl",
-            "net.dv8tion.jda.api.managers",
-            "net.dv8tion.jda.api.entities",
             "net.dv8tion.jda.api",
-            "java.lang",
+            "net.dv8tion.jda.api.entities",
+            "net.dv8tion.jda.api.events",
+            "net.dv8tion.jda.api.managers",
             "java.io",
+            "java.sql",
+            "java.text",
+            "java.lang",
+            "java.lang.reflect",
+            "java.lang.management",
             "java.math",
+            "java.time",
+            "java.time.chrono",
+            "java.time.format",
+            "java.time.temporal",
+            "java.time.zone",
             "java.util",
+            "java.util.regex",
+            "java.util.stream",
+            "java.util.logging",
             "java.util.concurrent",
-            "java.time"
+            "java.util.concurrent.atomic",
+        ).plus(
+            if (!isBukkit) emptySet() else setOf(
+                "org.bukkit",
+                "org.bukkit.enchantments",
+                "org.bukkit.entity",
+                "org.bukkit.event",
+                "org.bukkit.event.block",
+                "org.bukkit.event.enchantment",
+                "org.bukkit.event.entity",
+                "org.bukkit.event.hanging",
+                "org.bukkit.event.inventory",
+                "org.bukkit.event.painting",
+                "org.bukkit.event.player",
+                "org.bukkit.event.server",
+                "org.bukkit.event.vehicle",
+                "org.bukkit.event.weather",
+                "org.bukkit.event.world",
+                "org.bukkit.generator",
+                "org.bukkit.help",
+                "org.bukkit.inventory",
+                "org.bukkit.inventory.meta",
+                "org.bukkit.map",
+                "org.bukkit.material",
+                "org.bukkit.metadata",
+                "org.bukkit.plugin",
+                "org.bukkit.plugin.java",
+                "org.bukkit.potion",
+                "org.bukkit.projectiles",
+                "org.bukkit.scheduler",
+                "org.bukkit.scoreboard",
+                "org.spigotmc",
+                "org.spigotmc.event.entity",
+                "org.spigotmc.event.player"
+            )
         ).plus(this.imports)
         val packages = imports.filter { import -> runCatchingOrNull { Class.forName(import) } == null }
-        val classes = imports - packages
-        val importStr = "with (new JavaImporter(${packages.joinToString(transform = { "Packages.$it" })})) { ${classes.joinToString { import ->
-            "var ${import.split('.').last()} = Java.Type(\"$import\"); "
-        }}"
+        val importStr = "with (new JavaImporter(${
+            imports.joinToString(transform = {
+                "${if (it in packages) "Packages." else ""}$it"
+            })
+        })) { "
         val code = "$importStr${
             codeBlock.findAll(args.joinToString(" "))
                 .map { it.groups.last()?.value }
