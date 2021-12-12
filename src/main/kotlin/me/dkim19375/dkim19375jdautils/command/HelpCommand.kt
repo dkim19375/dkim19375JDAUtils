@@ -105,6 +105,6 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
             sendHelpUsage(cmd, event, command)
             return
         }
-        event.channel.sendMessage(embed(event, cmd, type)).queue()
+        event.channel.sendMessageEmbeds(embed(event, cmd, type)).queue()
     }
 }

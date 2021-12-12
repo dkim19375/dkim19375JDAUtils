@@ -29,9 +29,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.data.Whitelist
-import me.dkim19375.dkim19375jdautils.util.*
+import me.dkim19375.dkim19375jdautils.util.EventType
+import me.dkim19375.dkim19375jdautils.util.getMessageId
+import me.dkim19375.dkim19375jdautils.util.getUserId
 import me.dkim19375.dkimcore.annotation.API
-import me.dkim19375.dkimcore.coroutine.ActionConsumer
+import me.dkim19375.dkimcore.async.ActionConsumer
+import me.dkim19375.dkimcore.async.CoroutineConsumer
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.extension.combine
 import me.dkim19375.dkimcore.extension.getRandomUUID
@@ -55,10 +58,10 @@ import kotlin.reflect.KClass
  */
 open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     @API
-    val events = mutableMapOf<UUID, (Event) -> ActionConsumer<Pair<Boolean, Boolean>>>()
+    val events = mutableMapOf<UUID, (Event) -> CoroutineConsumer<Pair<Boolean, Boolean>>>()
 
     @API
-    val singleEvents = mutableMapOf<Type, MutableMap<UUID, (Event) -> ActionConsumer<Pair<Boolean, Boolean>>>>()
+    val singleEvents = mutableMapOf<Type, MutableMap<UUID, (Event) -> CoroutineConsumer<Pair<Boolean, Boolean>>>>()
 
     override fun onGuildMessageReactionAdd(event: GuildMessageReactionAddEvent) {
         SCOPE.launch { onEvent(Type.REACTION_ADD, event) }
@@ -94,7 +97,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         singleEvents.forEach { (_, map) -> map.remove(uuid) }
     }
 
-    @Synchronized
+    // @Synchronized
     protected open suspend fun onEvent(@Suppress("SameParameterValue") type: Type, event: Event) {
         events.toList().forEach { e ->
             val result = e.second(event).await()
@@ -162,8 +165,8 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     ): UUID {
         val combined = events.keys.plus(singleEvents.values.map { a -> a.keys }.combine())
         val uuid = combined.getRandomUUID()
-        val actionVar: (Event) -> ActionConsumer<Pair<Boolean, Boolean>> = actionLabel@{ event ->
-            return@actionLabel ActionConsumer {
+        val actionVar: (Event) -> CoroutineConsumer<Pair<Boolean, Boolean>> = actionLabel@{ event ->
+            return@actionLabel CoroutineConsumer {
                 runBlocking {
                     onReactionAddCoroutine(
                         permanent,

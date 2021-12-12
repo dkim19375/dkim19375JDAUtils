@@ -109,7 +109,7 @@ abstract class Command(private val bot: BotBase) {
         if (!permissions.hasAccess(user, member, channel as? GuildChannel)) {
             return
         }
-        channel.sendMessage(helpEmbed(user, guild, cmd, command)).queue()
+        channel.sendMessageEmbeds(helpEmbed(user, guild, cmd, command)).queue()
     }
 
     /**
