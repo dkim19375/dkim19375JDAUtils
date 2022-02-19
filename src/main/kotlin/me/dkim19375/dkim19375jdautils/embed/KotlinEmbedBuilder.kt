@@ -136,8 +136,8 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
             return builder
         }
 
-        fun getExtensionFunction(actions: KotlinEmbedBuilder.() -> KotlinEmbedBuilder): MessageEmbed {
-            return KotlinEmbedBuilder().actions().build()
+        fun getExtensionFunction(actions: KotlinEmbedBuilder.() -> Unit): MessageEmbed {
+            return KotlinEmbedBuilder().apply(actions).build()
         }
     }
 
