@@ -30,6 +30,7 @@ import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkimcore.annotation.API
 import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.lang.reflect.Constructor
@@ -54,10 +55,9 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
     open val imports: Set<String> = emptySet()
     open val variables: (MessageReceivedEvent) -> Map<String, Any> = { emptyMap() }
     private val isBukkit = runCatchingOrNull { Class.forName("org.bukkit.Bukkit") } != null
-    private val engineType: Constructor<*> = run {
-        val name = "nashorn.api.scripting.NashornScriptEngineFactory"
-        (runCatchingOrNull { Class.forName("jdk.$name") } ?: Class.forName("org.openjdk.$name"))
-            .getDeclaredConstructor()
+    protected open val engineType: Constructor<*> = run {
+        (runCatchingOrNull { Class.forName("jdk.nashorn.api.scripting.NashornScriptEngineFactory") }
+            ?: NashornScriptEngineFactory::class.java).getDeclaredConstructor()
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
