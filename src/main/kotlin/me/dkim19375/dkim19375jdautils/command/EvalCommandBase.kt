@@ -32,7 +32,8 @@ import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.io.PrintWriter
 import java.io.StringWriter
-import javax.script.ScriptEngineManager
+import java.lang.reflect.Constructor
+import javax.script.ScriptEngineFactory
 import kotlin.system.measureTimeMillis
 
 
@@ -53,6 +54,11 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
     open val imports: Set<String> = emptySet()
     open val variables: (MessageReceivedEvent) -> Map<String, Any> = { emptyMap() }
     private val isBukkit = runCatchingOrNull { Class.forName("org.bukkit.Bukkit") } != null
+    private val engineType: Constructor<*> = run {
+        val name = "nashorn.api.scripting.NashornScriptEngineFactory"
+        (runCatchingOrNull { Class.forName("jdk.$name") } ?: Class.forName("org.openjdk.$name"))
+            .getDeclaredConstructor()
+    }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun onCommand(
@@ -62,8 +68,7 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         all: String,
         event: MessageReceivedEvent
     ) {
-        val factory = ScriptEngineManager()
-        val engine = factory.getEngineByName("nashorn")
+        val engine = (engineType.newInstance() as ScriptEngineFactory).scriptEngine
         val imports = setOf(
             "net.dv8tion.jda.api",
             "net.dv8tion.jda.api.entities",
@@ -143,7 +148,9 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
         variables["selfUser"] = event.jda.selfUser
         variables["bot"] = bot
 
-        variables.plus(variables(event)).forEach(engine::put)
+        variables.plus(variables(event)).filter<String?, Any?> { (key, value) ->
+            key != null && value != null && key.isNotEmpty()
+        }.forEach { engine.put(it.key, it.value) }
 
         val strWriter = StringWriter()
         val printWriter = PrintWriter(strWriter)

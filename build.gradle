@@ -16,7 +16,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.9.12'
+version '2.9.13'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -49,6 +49,8 @@ repositories {
 
 dependencies {
     compileOnly "net.dv8tion:JDA:$JDA_VER"
+    compileOnly 'org.openjdk.nashorn:nashorn-core:15.3'
+
     //noinspection GradlePackageUpdate
     api 'commons-io:commons-io:2.11.0'
     api 'org.apache.commons:commons-lang3:3.12.0'
