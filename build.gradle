@@ -54,7 +54,7 @@ dependencies {
     //noinspection GradlePackageUpdate
     api 'commons-io:commons-io:2.11.0'
     api 'org.apache.commons:commons-lang3:3.12.0'
-    api 'com.github.minndevelopment:jda-ktx:0.4.0'
+    api 'com.github.minndevelopment:jda-ktx:0.7.0'
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER"
     //noinspection GradlePackageUpdate
@@ -67,7 +67,7 @@ dependencies {
     testImplementation "net.dv8tion:JDA:$JDA_VER"
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
-    testImplementation 'com.github.minndevelopment:jda-ktx:0.4.0'
+    testImplementation 'com.github.minndevelopment:jda-ktx:0.7.0'
     testImplementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
 
     // testing libs
