@@ -16,7 +16,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.9.14'
+version '2.9.15'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -61,7 +61,7 @@ dependencies {
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0'
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.0'
-    api 'io.github.dkim19375:dkimcore:1.2.10'
+    api 'io.github.dkim19375:dkimcore:1.2.12'
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
     testImplementation "net.dv8tion:JDA:$JDA_VER"

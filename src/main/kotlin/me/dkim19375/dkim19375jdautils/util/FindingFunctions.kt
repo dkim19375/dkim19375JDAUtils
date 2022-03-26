@@ -28,7 +28,6 @@ package me.dkim19375.dkim19375jdautils.util
 
 import dev.minn.jda.ktx.await
 import kotlinx.coroutines.runBlocking
-import me.dkim19375.dkimcore.extension.combine
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
@@ -66,7 +65,7 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
         (manager?.guilds ?: guilds)
             .map(Guild::loadMembers)
             .map { it.await() }
-            .combine()
+            .flatten()
             .map(Member::getUser)
     }
     when {
@@ -551,7 +550,7 @@ suspend fun JDA.findEmotes(query: String, useShardManager: Boolean = false, useC
                     null
                 }
             }
-            .combine()
+            .flatten()
             .map {
                 it as Emote
             }

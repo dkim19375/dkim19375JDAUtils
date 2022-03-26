@@ -36,7 +36,6 @@ import me.dkim19375.dkimcore.annotation.API
 import me.dkim19375.dkimcore.async.ActionConsumer
 import me.dkim19375.dkimcore.async.CoroutineConsumer
 import me.dkim19375.dkimcore.extension.SCOPE
-import me.dkim19375.dkimcore.extension.combine
 import me.dkim19375.dkimcore.extension.getRandomUUID
 import me.dkim19375.dkimcore.extension.removeIf
 import net.dv8tion.jda.api.entities.*
@@ -163,7 +162,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         retrieveMember: Boolean = true,
         debug: Boolean = false
     ): UUID {
-        val combined = events.keys.plus(singleEvents.values.map { a -> a.keys }.combine())
+        val combined = events.keys.plus(singleEvents.values.map { a -> a.keys }.flatten())
         val uuid = combined.getRandomUUID()
         val actionVar: (Event) -> CoroutineConsumer<Pair<Boolean, Boolean>> = actionLabel@{ event ->
             return@actionLabel CoroutineConsumer {
