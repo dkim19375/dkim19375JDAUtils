@@ -58,7 +58,7 @@ dependencies {
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER"
     //noinspection GradlePackageUpdate
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1'
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.1'
     api 'io.github.dkim19375:dkimcore:1.2.12'
