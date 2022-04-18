@@ -28,10 +28,7 @@ import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkimcore.annotation.API
 import me.dkim19375.dkimcore.extension.containsIgnoreCase
 import net.dv8tion.jda.api.entities.*
-import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent
 
 /**
  * An abstract class to listen to detect if a command is valid to send
@@ -59,33 +56,17 @@ abstract class CustomListener {
     open fun onMessageReceived(event: MessageReceivedEvent): Boolean = true
 
     /**
-     * @param event The [GuildMessageReceivedEvent] of this message
-     * @return true if the command should run, false if not
-     */
-    @API
-    open fun onGuildMessageReceived(event: GuildMessageReceivedEvent): Boolean = true
-
-    /**
-     * @param event The [PrivateMessageReceivedEvent] of this message
-     * @return true if the command should run, false if not
-     */
-    @API
-    open fun onPrivateMessageReceived(event: PrivateMessageReceivedEvent): Boolean = true
-
-    /**
-     * **NOTE:** This will get called on [MessageReceivedEvent], which will also call [PrivateMessageReceivedEvent] *and*
-     * [GuildMessageReceivedEvent]!!
+     * **NOTE:** This will get called on [MessageReceivedEvent]
      *
      * @param command the [Command] that was sent
      * @param cmd the exact [command/alias][String] that was sent
      * @param args the [args][List] of the command
-     * @param member the [Member] who sent the command in [GuildMessageReceivedEvent], or **null** if the command was
-     * sent in [PrivateMessageReceivedEvent] or [MessageReceivedEvent]
+     * @param member the [Member] who sent the command, or **null** if not from a server
      * @param user the [User] who sent the command
      * @param guild the [Guild] of where the command was sent
      * @param message the [Message] that was sent
      * @param channel the [MessageChannel] of where the command was sent
-     * @param event either [MessageReceivedEvent], [GuildMessageReceivedEvent], or [PrivateMessageReceivedEvent]
+     * @param event the [MessageReceivedEvent]
      * @return true if the command should execute
      */
     @API
@@ -98,7 +79,7 @@ abstract class CustomListener {
         guild: Guild?,
         message: Message,
         channel: MessageChannel,
-        event: Event
+        event: MessageReceivedEvent
     ): Boolean {
         if (!command.aliases.plus(command.command).containsIgnoreCase(cmd)) {
             return false
@@ -110,19 +91,14 @@ abstract class CustomListener {
             return false
         }
         member?.let {
-            if (command.permissions.hasAccess(user, member, (event as? GuildMessageReceivedEvent)?.channel)) {
+            if (command.permissions.hasAccess(user, member, event.channel as? GuildChannel)) {
                 return@let
             }
-            if (event !is MessageReceivedEvent) {
-                channel.sendMessage("You do not have permission!").queue()
-            }
+            channel.sendMessage("You do not have permission!").queue()
             return false
         }
         if (args.size < command.minArgs) {
-            when (event) {
-                is PrivateMessageReceivedEvent -> command.sendHelpUsage(cmd, event)
-                is GuildMessageReceivedEvent -> command.sendHelpUsage(cmd, event)
-            }
+            command.sendHelpUsage(cmd, event)
             return false
         }
         return true

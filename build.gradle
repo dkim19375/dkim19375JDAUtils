@@ -9,14 +9,14 @@ plugins {
 }
 
 final KOTLIN_VER = '1.6.20'
-final JDA_VER = '4.4.0_352'
+final JDA_VER = '5.0.0-alpha.10'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.9.15'
+version '2.10.0'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {

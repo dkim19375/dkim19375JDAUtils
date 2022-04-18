@@ -48,7 +48,7 @@ class Bot : BotBase() {
         onStart()
     }
     
-    override fun getPrefix(guild: String): String {
+    override fun getPrefix(guild: String?): String {
         return "!"
     }
 }

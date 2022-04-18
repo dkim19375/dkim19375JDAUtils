@@ -30,10 +30,7 @@ import me.dkim19375.dkim19375jdautils.embed.EmbedUtils
 import me.dkim19375.dkim19375jdautils.embed.KotlinEmbedBuilder
 import me.dkim19375.dkimcore.annotation.API
 import net.dv8tion.jda.api.entities.*
-import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent
 import java.awt.Color
 
 /**
@@ -80,36 +77,19 @@ abstract class Command(private val bot: BotBase) {
      * Send help usage
      *
      * @param cmd The command of the sent message
-     * @param event either [PrivateMessageReceivedEvent], [GuildMessageReceivedEvent], or [MessageReceivedEvent]
+     * @param event The [MessageReceivedEvent]
      * @param command the [Command] to set the help message for
      */
     open fun sendHelpUsage(
         cmd: String,
-        event: Event,
+        event: MessageReceivedEvent,
         command: Command = this
     ) {
-        val user = when (event) {
-            is GuildMessageReceivedEvent -> event.author
-            is PrivateMessageReceivedEvent -> event.author
-            is MessageReceivedEvent -> event.author
-            else -> return
-        }
-        val member: Member? = (event as? GuildMessageReceivedEvent)?.member
-        val guild = when (event) {
-            is GuildMessageReceivedEvent -> event.guild
-            is MessageReceivedEvent -> if (event.isFromGuild) event.guild else null
-            else -> null
-        }
-        val channel = when (event) {
-            is GuildMessageReceivedEvent -> event.channel
-            is PrivateMessageReceivedEvent -> event.channel
-            is MessageReceivedEvent -> event.channel
-            else -> return
-        }
-        if (!permissions.hasAccess(user, member, channel as? GuildChannel)) {
+        val guild = if (event.isFromGuild) event.guild else null
+        if (!permissions.hasAccess(event.author, event.member, event.channel as? GuildChannel)) {
             return
         }
-        channel.sendMessageEmbeds(helpEmbed(user, guild, cmd, command)).queue()
+        event.channel.sendMessageEmbeds(helpEmbed(event.author, guild, cmd, command)).queue()
     }
 
     /**
@@ -141,70 +121,6 @@ abstract class Command(private val bot: BotBase) {
         prefix: String,
         all: String,
         event: MessageReceivedEvent
-    ) {
-    }
-
-    /**
-     * Called when a guild message was received
-     *
-     * Should not be used for general command handling
-     *
-     * @param message The message that the user sent
-     * @param event The [GuildMessageReceivedEvent] of the sent message
-     */
-    open suspend fun onGuildMessageReceived(
-        message: String,
-        event: GuildMessageReceivedEvent
-    ) {
-    }
-
-    /**
-     * On guild command
-     *
-     * @param cmd The command/alias
-     * @param args The args, for example: **!help fun 2** would be **{ "fun", "2" }**
-     * @param prefix The prefix of the command sent
-     * @param all The entire raw command **excluding** the prefix
-     * @param event The [GuildMessageReceivedEvent]
-     */
-    open suspend fun onGuildCommand(
-        cmd: String,
-        args: List<String>,
-        prefix: String,
-        all: String,
-        event: GuildMessageReceivedEvent
-    ) {
-    }
-
-    /**
-     * Called when a private message was received
-     *
-     * Should not be used for general command handling
-     *
-     * @param message The message that the user sent
-     * @param event The [PrivateMessageReceivedEvent] of the sent message
-     */
-    open suspend fun onPrivateMessageReceived(
-        message: String,
-        event: PrivateMessageReceivedEvent
-    ) {
-    }
-
-    /**
-     * On private command
-     *
-     * @param cmd The command/alias
-     * @param args The args, for example: **!help fun 2** would be **{ "fun", "2" }**
-     * @param prefix The prefix of the command sent
-     * @param all The entire raw command **excluding** the prefix
-     * @param event The [PrivateMessageReceivedEvent]
-     */
-    open suspend fun onPrivateCommand(
-        cmd: String,
-        args: List<String>,
-        prefix: String,
-        all: String,
-        event: PrivateMessageReceivedEvent
     ) {
     }
 }

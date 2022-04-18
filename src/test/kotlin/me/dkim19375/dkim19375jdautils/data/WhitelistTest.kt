@@ -81,7 +81,7 @@ internal class WhitelistTest {
             on { it.jda }.thenReturn(jda)
         }
         val permissions = mutableSetOf(Permission.VIEW_CHANNEL)
-        val perms2 = permissions.plus(Permission.MESSAGE_WRITE)
+        val perms2 = permissions.plus(Permission.MESSAGE_SEND)
         val member = mock<Member> {
             on { hasPermission(permissions) }.thenReturn(true)
             on { hasPermission(perms2) }.thenReturn(false)

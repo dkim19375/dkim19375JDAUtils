@@ -31,8 +31,6 @@ import me.dkim19375.dkim19375jdautils.data.MessageReceivedData
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.extension.typedNull
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class EventListener(private val bot: BotBase) : ListenerAdapter() {
@@ -114,83 +112,6 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         }
     }
 
-    override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
-        if (!bot.customListener.onGuildMessageReceived(event)) {
-            return
-        }
-        bot.sendEvent { command ->
-            SCOPE.launch {
-                try {
-                    command.onGuildMessageReceived(event.message.contentRaw, event)
-                } catch (e: Exception) {
-                    bot.errorHandler.onGuildMessageReceived(e, event, command)
-                }
-            }
-        }
-        val msg = getMessage(event.message.contentRaw, event.guild.id, true)
-        if (msg != null) {
-            bot.sendEvent { command ->
-                SCOPE.launch {
-                    if (!isValid(command, msg.command, msg.args.toList(), event)) {
-                        return@launch
-                    }
-                    try {
-                        command.onGuildCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
-                    } catch (e: Exception) {
-                        bot.errorHandler.onGuildMessageReceivedCommand(e, event, command, msg)
-                    }
-                }
-            }
-        }
-    }
-
-    override fun onPrivateMessageReceived(event: PrivateMessageReceivedEvent) {
-        if (!bot.customListener.onPrivateMessageReceived(event)) {
-            return
-        }
-        bot.sendEvent { command ->
-            SCOPE.launch {
-                try {
-                    command.onPrivateMessageReceived(event.message.contentRaw, event)
-                } catch (e: Exception) {
-                    bot.errorHandler.onPrivateMessageReceived(e, event, command)
-                }
-            }
-        }
-        val msg = getMessage(event.message.contentRaw, null, false)
-        if (msg != null) {
-            bot.sendEvent { command ->
-                SCOPE.launch {
-                    if (!isValid(command, msg.command, msg.args.toList(), event)) {
-                        return@launch
-                    }
-                    try {
-                        command.onPrivateCommand(msg.command, msg.args.toList(), msg.prefix, msg.all, event)
-                    } catch (e: Exception) {
-                        bot.errorHandler.onPrivateMessageReceivedCommand(e, event, command, msg)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun isValid(
-        command: Command,
-        cmd: String,
-        args: List<String>,
-        event: GuildMessageReceivedEvent
-    ): Boolean = bot.customListener.isValid(
-        command = command,
-        cmd = cmd,
-        args = args,
-        member = event.member,
-        user = event.author,
-        guild = event.guild,
-        message = event.message,
-        channel = event.channel,
-        event = event
-    )
-
     private fun isValid(
         command: Command,
         cmd: String,
@@ -207,23 +128,6 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
         } catch (_: IllegalStateException) {
             null
         },
-        message = event.message,
-        channel = event.channel,
-        event = event
-    )
-
-    private fun isValid(
-        command: Command,
-        cmd: String,
-        args: List<String>,
-        event: PrivateMessageReceivedEvent
-    ): Boolean = bot.customListener.isValid(
-        command = command,
-        cmd = cmd,
-        args = args,
-        member = null,
-        user = event.author,
-        guild = null,
         message = event.message,
         channel = event.channel,
         event = event

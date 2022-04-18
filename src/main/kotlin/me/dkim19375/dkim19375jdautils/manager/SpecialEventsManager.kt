@@ -30,8 +30,6 @@ import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkim19375jdautils.util.EventType
-import me.dkim19375.dkim19375jdautils.util.getMessageId
-import me.dkim19375.dkim19375jdautils.util.getUserId
 import me.dkim19375.dkimcore.annotation.API
 import me.dkim19375.dkimcore.async.ActionConsumer
 import me.dkim19375.dkimcore.async.CoroutineConsumer
@@ -40,8 +38,6 @@ import me.dkim19375.dkimcore.extension.getRandomUUID
 import me.dkim19375.dkimcore.extension.removeIf
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.Event
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent
-import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import java.util.*
@@ -57,25 +53,17 @@ import kotlin.reflect.KClass
  */
 open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     @API
-    val events = mutableMapOf<UUID, (Event) -> CoroutineConsumer<Pair<Boolean, Boolean>>>()
+    val events = mutableMapOf<UUID, (MessageReactionAddEvent) -> CoroutineConsumer<Pair<Boolean, Boolean>>>()
 
     @API
-    val singleEvents = mutableMapOf<Type, MutableMap<UUID, (Event) -> CoroutineConsumer<Pair<Boolean, Boolean>>>>()
-
-    override fun onGuildMessageReactionAdd(event: GuildMessageReactionAddEvent) {
-        SCOPE.launch { onEvent(Type.REACTION_ADD, event) }
-    }
-
-    override fun onPrivateMessageReactionAdd(event: PrivateMessageReactionAddEvent) {
-        SCOPE.launch { onEvent(Type.REACTION_ADD, event) }
-    }
+    val singleEvents = mutableMapOf<Type, MutableMap<UUID, (MessageReactionAddEvent) -> CoroutineConsumer<Pair<Boolean, Boolean>>>>()
 
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
         SCOPE.launch { onEvent(Type.REACTION_ADD, event) }
     }
 
     @API
-    fun getTask(uuid: UUID): ((Event) -> ActionConsumer<Pair<Boolean, Boolean>>)? {
+    fun getTask(uuid: UUID): ((MessageReactionAddEvent) -> ActionConsumer<Pair<Boolean, Boolean>>)? {
         events[uuid]?.let {
             return it
         }
@@ -97,7 +85,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     }
 
     // @Synchronized
-    protected open suspend fun onEvent(@Suppress("SameParameterValue") type: Type, event: Event) {
+    protected open suspend fun onEvent(@Suppress("SameParameterValue") type: Type, event: MessageReactionAddEvent) {
         events.toList().forEach { e ->
             val result = e.second(event).await()
             if (result.second && result.first) {
@@ -164,7 +152,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     ): UUID {
         val combined = events.keys.plus(singleEvents.values.map { a -> a.keys }.flatten())
         val uuid = combined.getRandomUUID()
-        val actionVar: (Event) -> CoroutineConsumer<Pair<Boolean, Boolean>> = actionLabel@{ event ->
+        val actionVar: (MessageReactionAddEvent) -> CoroutineConsumer<Pair<Boolean, Boolean>> = actionLabel@{ event ->
             return@actionLabel CoroutineConsumer {
                 runBlocking {
                     onReactionAddCoroutine(
@@ -213,74 +201,29 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         retrieveMember: Boolean = true,
         debug: Boolean = false,
         uuid: UUID,
-        event: Event
+        event: MessageReactionAddEvent
     ): Pair<Boolean, Boolean> {
         if (debug) {
             println("called ------------")
         }
         val jda = event.jda
-        when (event) {
-            is GuildMessageReactionAddEvent -> if (eventType != EventType.GUILD) {
-                return Pair(first = false, second = false)
-            }
-            is MessageReactionAddEvent -> if (eventType != EventType.GENERIC) {
-                return Pair(first = false, second = false)
-            }
-            is PrivateMessageReactionAddEvent -> if (eventType != EventType.PRIVATE) {
-                return Pair(first = false, second = false)
-            }
+        val guild = if (event.isFromGuild) event.guild else null
+        if (eventType != EventType.GENERIC) {
+            return false to false
         }
-        if (debug) {
-            println("passed EventType test")
-        }
-        val messageId: Long = event.getMessageId() ?: let {
-            return Pair(first = false, second = false)
-        }
-        if (debug) {
-            println("passed messageId 1")
-        }
-        val userId: Long = event.getUserId() ?: let {
-            return Pair(first = false, second = false)
-        }
-        if (debug) {
-            println("passed userId test")
-        }
-        val emoji: MessageReaction.ReactionEmote = when (event) {
-            is GuildMessageReactionAddEvent -> event.reactionEmote
-            is MessageReactionAddEvent -> event.reactionEmote
-            is PrivateMessageReactionAddEvent -> event.reactionEmote
-            else -> {
-                return Pair(first = false, second = false)
-            }
-        }
-        if (debug) {
-            println("passed emoji test")
-        }
-        val channel = when (event) {
-            is GuildMessageReactionAddEvent -> event.channel
-            is MessageReactionAddEvent -> event.channel
-            is PrivateMessageReactionAddEvent -> event.channel
-            else -> {
-                return Pair(first = false, second = false)
-            }
-        }
-        if (debug) {
-            println("passed channel test")
-        }
-        val guild: Guild? = (channel as? GuildChannel)?.guild
-        if (requiredChannel != 0L && requiredChannel != channel.idLong) {
+        if (requiredChannel != 0L && requiredChannel != event.channel.idLong) {
             if (debug) {
-                println("stopped - requiredChannel: $requiredChannel, channel: ${channel.idLong}")
+                println("stopped - requiredChannel: $requiredChannel, channel: ${event.channel.idLong}")
             }
-            return Pair(first = false, second = false)
+            return false to false
         }
         if (debug) {
             println("passed channel id test")
         }
         if (reaction != null) {
-            if (reaction.name != emoji.name) {
+            if (reaction.name != event.reactionEmote.name) {
                 if (debug) {
-                    println("stopped - reaction name: ${reaction.name}, emoji name: ${emoji.name}")
+                    println("stopped - reaction name: ${reaction.name}, emoji name: ${event.reactionEmote.name}")
                 }
                 return Pair(first = false, second = false)
             }
@@ -288,12 +231,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         if (debug) {
             println("passed reaction tests")
         }
-        val msg: Message = when (event) {
-            is GuildMessageReactionAddEvent -> event.retrieveMessage().await()
-            is MessageReactionAddEvent -> event.retrieveMessage().await()
-            is PrivateMessageReactionAddEvent -> event.channel.retrieveMessageById(event.messageIdLong).await()
-            else -> return Pair(first = false, second = false)
-        }
+        val msg = event.retrieveMessage().await()
         if (debug) {
             println("passed message test")
         }
@@ -301,22 +239,22 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             if (debug) {
                 println("stopped - requiredGuild: $requiredGuild, guild: ${guild.idLong}")
             }
-            return Pair(first = false, second = false)
+            return false to false
         }
         if (debug) {
             println("passed requiredGuild test")
         }
-        if (requiredMessage != messageId && requiredMessage != 0L) {
+        if (requiredMessage != event.messageIdLong && requiredMessage != 0L) {
             if (debug) {
-                println("stopped 2 - requiredMessage: $requiredMessage, messageId: $messageId")
+                println("stopped 2 - requiredMessage: $requiredMessage, messageId: ${msg.idLong}")
             }
-            return Pair(first = false, second = false)
+            return false to false
         }
         if (debug) {
             println("passed requiredMessage test")
         }
-        val user = jda.retrieveUserById(userId).await()
-        val member = if (retrieveMember) guild?.retrieveMemberById(userId)?.await() else null
+        val user = event.retrieveUser().await()
+        val member = if (retrieveMember) guild?.retrieveMemberById(user.idLong)?.await() else null
         val runAction = { success: Boolean ->
             member?.let {
                 if (!success) {
@@ -334,42 +272,37 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
                 }
             }
         }
-        if (whitelist.hasAccess(user, member, channel as? GuildChannel)) {
+        if (whitelist.hasAccess(user, member, event.channel as? GuildChannel)) {
             runAction(true)
-            return Pair(
-                first = true,
-                second = !action(event, guild, emoji, channel, user, msg, member, uuid)
-            )
+            return true to !action(event, guild, event.reactionEmote, event.channel, user, msg, member, uuid)
         }
         if (debug) {
             println("no permissions")
         }
         if (removeIfNoPerms && !user.isBot && user.idLong != jda.selfUser.idLong) {
             runAction(false)
-            return Pair(first = false, second = false)
+            return false to false
         }
         if (user.isBot && removeBotIfNoPerms) {
             runAction(false)
-            return Pair(first = false, second = false)
+            return false to false
         }
         if (user.idLong == jda.selfUser.idLong && removeSelfIfNoPerms) {
             runAction(false)
-            return Pair(first = false, second = false)
+            return false to false
         }
         when {
-            emoji.isEmoji -> msg.removeReaction(emoji.emoji, user).await()
-            emoji.isEmote -> msg.removeReaction(emoji.emote, user).await()
+            event.reactionEmote.isEmoji -> msg.removeReaction(event.reactionEmote.emoji, user).await()
+            event.reactionEmote.isEmote -> msg.removeReaction(event.reactionEmote.emote, user).await()
         }
         runAction(false)
-        return Pair(first = false, second = false)
+        return false to false
     }
 
     enum class Type(@API val classes: Set<KClass<out Event>>) {
         REACTION_ADD(
             setOf(
-                MessageReactionAddEvent::class,
-                GuildMessageReactionAddEvent::class,
-                PrivateMessageReactionAddEvent::class
+                MessageReactionAddEvent::class
             )
         )
     }

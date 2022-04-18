@@ -38,7 +38,6 @@ import java.time.*
 import java.time.temporal.TemporalAccessor
 import java.util.*
 
-private const val ZERO_WIDTH_SPACE = "\u200E"
 private val URL_PATTERN = Regex("\\s*(https?|attachment)://\\S+\\s*", RegexOption.IGNORE_CASE)
 
 /**
@@ -274,15 +273,11 @@ class KotlinEmbedBuilder(embed: MessageEmbed? = null) {
     }
 
     fun addField(name: String? = null, value: String? = null, inline: Boolean): KotlinEmbedBuilder {
-        if (name == null && value == null) return this
-        fields.add(Field(name, value, inline))
+        fields.add(Field(name ?: EmbedBuilder.ZERO_WIDTH_SPACE, value ?: EmbedBuilder.ZERO_WIDTH_SPACE, inline))
         return this
     }
 
-    fun addBlankField(inline: Boolean): KotlinEmbedBuilder {
-        fields.add(Field(ZERO_WIDTH_SPACE, ZERO_WIDTH_SPACE, inline))
-        return this
-    }
+    fun addBlankField(inline: Boolean): KotlinEmbedBuilder = addField(null, null, inline)
 
     private fun urlCheck(url: String? = null) {
         url ?: return

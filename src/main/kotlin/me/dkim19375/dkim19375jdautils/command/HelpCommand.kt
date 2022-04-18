@@ -32,7 +32,6 @@ import me.dkim19375.dkim19375jdautils.util.getOfType
 import me.dkim19375.dkimcore.annotation.API
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import java.awt.Color
 
 /**
@@ -86,7 +85,7 @@ open class HelpCommand(private val bot: BotBase) : Command(bot) {
      * @param args The args, for example: **!help fun 2** would be **{ "fun", "2" }**
      * @param prefix The prefix of the command sent
      * @param all The entire raw command **excluding** the prefix
-     * @param event The [GuildMessageReceivedEvent]
+     * @param event The [MessageReceivedEvent]
      */
     override suspend fun onCommand(
         cmd: String,

@@ -28,15 +28,12 @@ import dev.minn.jda.ktx.injectKTX
 import kotlinx.coroutines.launch
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkim19375jdautils.command.CommandType
-import me.dkim19375.dkim19375jdautils.command.EvalCommandBase
-import me.dkim19375.dkim19375jdautils.command.HelpCommand
 import me.dkim19375.dkim19375jdautils.event.CustomListener
 import me.dkim19375.dkim19375jdautils.event.ErrorHandler
 import me.dkim19375.dkim19375jdautils.event.EventListener
 import me.dkim19375.dkim19375jdautils.impl.CustomJDABuilder
 import me.dkim19375.dkim19375jdautils.manager.SpecialEventsManager
 import me.dkim19375.dkimcore.annotation.API
-import me.dkim19375.dkimcore.extension.IO_SCOPE
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.file.YamlFile
 import net.dv8tion.jda.api.JDA
@@ -173,7 +170,7 @@ abstract class BotBase {
     @API
     open fun onStart(
         stopCommandEnabled: Boolean = true,
-        await: Boolean = false,
+        await: Boolean = true,
         executorService: ExecutorService? = Executors.newSingleThreadExecutor()
     ) {
         if (started) {

@@ -24,8 +24,10 @@
 
 package me.dkim19375.dkim19375jdautils.util
 
+import me.dkim19375.dkimcore.annotation.API
 import net.dv8tion.jda.api.entities.Message
 
 private val UNESCAPE_REGEX = Regex("\\\\([^\\p{L}\\d\\s@#])")
 
+@API
 fun Message.getDisplayedText(): String = UNESCAPE_REGEX.replace(contentStripped) { it.groups[1]?.value ?: "" }
