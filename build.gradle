@@ -9,7 +9,7 @@ plugins {
 }
 
 final KOTLIN_VER = '1.6.21'
-final JDA_VER = '5.0.0-alpha.11'
+final JDA_VER = '5.0.0-alpha.12'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
