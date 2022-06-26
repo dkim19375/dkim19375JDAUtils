@@ -30,6 +30,7 @@ import dev.minn.jda.ktx.await
 import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.sharding.ShardManager
 import java.util.concurrent.CompletableFuture
@@ -77,9 +78,9 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
         }
         fullRefMatch.matches() -> {
             val lowerName = fullRefMatch.group(1).lowercase()
-            val discrim = fullRefMatch.group(2)
+            val discriminator = fullRefMatch.group(2)
             users.filter { user: User ->
-                user.name.lowercase() == lowerName && user.discriminator == discrim
+                user.name.lowercase() == lowerName && user.discriminator == discriminator
             }
             if (users.isNotEmpty()) return users.toList()
         }
@@ -92,23 +93,23 @@ suspend fun JDA.findUsers(query: String, useShardManager: Boolean = false, useCa
         }
     }
     val exact = mutableListOf<User>()
-    val wrongcase = mutableListOf<User>()
-    val startswith = mutableListOf<User>()
+    val wrongCase = mutableListOf<User>()
+    val startsWith = mutableListOf<User>()
     val contains = mutableListOf<User>()
-    val lowerquery = query.lowercase()
+    val lowerQuery = query.lowercase()
     users.forEach { user: User ->
         val name = user.name
         when {
             name == query -> exact.add(user)
-            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongcase.add(user)
-            name.lowercase().startsWith(lowerquery) && wrongcase.isEmpty() -> startswith.add(user)
-            name.lowercase().contains(lowerquery) && startswith.isEmpty() -> contains.add(user)
+            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongCase.add(user)
+            name.lowercase().startsWith(lowerQuery) && wrongCase.isEmpty() -> startsWith.add(user)
+            name.lowercase().contains(lowerQuery) && startsWith.isEmpty() -> contains.add(user)
         }
     }
     return when {
         exact.isNotEmpty() -> exact
-        wrongcase.isNotEmpty() -> wrongcase
-        else -> startswith.ifEmpty { contains }
+        wrongCase.isNotEmpty() -> wrongCase
+        else -> startsWith.ifEmpty { contains }
     }
 }
 
@@ -129,7 +130,7 @@ suspend fun Guild.findBannedUsers(query: String, useCache: Boolean = true): List
     } catch (e: InsufficientPermissionException) {
         return null
     }
-    var discrim: String? = null
+    var discriminator: String? = null
     val userMention = USER_MENTION.matcher(mQuery)
     when {
         userMention.matches() -> {
@@ -139,7 +140,7 @@ suspend fun Guild.findBannedUsers(query: String, useCache: Boolean = true): List
             for (u in bans) if (u.id == id) return listOf(u)
         }
         FULL_USER_REF.matcher(mQuery).matches() -> {
-            discrim = mQuery.substring(mQuery.length - 4)
+            discriminator = mQuery.substring(mQuery.length - 4)
             mQuery = mQuery.substring(0, mQuery.length - 5).trim()
         }
         DISCORD_ID.matcher(mQuery).matches() -> {
@@ -149,25 +150,25 @@ suspend fun Guild.findBannedUsers(query: String, useCache: Boolean = true): List
         }
     }
     val exact = mutableListOf<User>()
-    val wrongcase = mutableListOf<User>()
-    val startswith = mutableListOf<User>()
+    val wrongCase = mutableListOf<User>()
+    val startsWith = mutableListOf<User>()
     val contains = mutableListOf<User>()
     val lowerQuery = mQuery.lowercase()
     for (u in bans) {
-        if (discrim != null && u.discriminator != discrim) {
+        if (discriminator != null && u.discriminator != discriminator) {
             continue
         }
         when {
             u.name == mQuery -> exact.add(u)
-            exact.isEmpty() && u.name.equals(mQuery, ignoreCase = true) -> wrongcase.add(u)
-            wrongcase.isEmpty() && u.name.lowercase().startsWith(lowerQuery) -> startswith.add(u)
-            startswith.isEmpty() && u.name.lowercase().contains(lowerQuery) -> contains.add(u)
+            exact.isEmpty() && u.name.equals(mQuery, ignoreCase = true) -> wrongCase.add(u)
+            wrongCase.isEmpty() && u.name.lowercase().startsWith(lowerQuery) -> startsWith.add(u)
+            startsWith.isEmpty() && u.name.lowercase().contains(lowerQuery) -> contains.add(u)
         }
     }
     return when {
         exact.isNotEmpty() -> exact
-        wrongcase.isNotEmpty() -> wrongcase
-        else -> startswith.ifEmpty { contains }
+        wrongCase.isNotEmpty() -> wrongCase
+        else -> startsWith.ifEmpty { contains }
     }
 }
 
@@ -190,11 +191,11 @@ suspend fun Guild.findMembers(query: String, useCache: Boolean = true): List<Mem
         }
         fullRefMatch.matches() -> {
             val lowerName = fullRefMatch.group(1).lowercase()
-            val discrim = fullRefMatch.group(2)
+            val discriminator = fullRefMatch.group(2)
             val members = (if (useCache) memberCache.toList() else loadMembers().await())
                 .filter { member: Member ->
                     member.user.name.lowercase() == lowerName && member.user
-                        .discriminator == discrim
+                        .discriminator == discriminator
                 }
             if (members.isNotEmpty()) return members.toList()
         }
@@ -206,10 +207,10 @@ suspend fun Guild.findMembers(query: String, useCache: Boolean = true): List<Mem
         }
     }
     val exact = mutableListOf<Member>()
-    val wrongcase = mutableListOf<Member>()
-    val startswith = mutableListOf<Member>()
+    val wrongCase = mutableListOf<Member>()
+    val startsWith = mutableListOf<Member>()
     val contains = mutableListOf<Member>()
-    val lowerquery = query.lowercase()
+    val lowerQuery = query.lowercase()
     (if (useCache) memberCache.toList() else loadMembers().await()).forEach { member: Member ->
         val name = member.user.name
         val effName = member.effectiveName
@@ -218,17 +219,17 @@ suspend fun Guild.findMembers(query: String, useCache: Boolean = true): List<Mem
             (name.equals(query, ignoreCase = true) || effName.equals(
                 query,
                 ignoreCase = true
-            )) && exact.isEmpty() -> wrongcase.add(member)
-            (name.lowercase().startsWith(lowerquery) || effName.lowercase()
-                .startsWith(lowerquery)) && wrongcase.isEmpty() -> startswith.add(member)
-            (name.lowercase().contains(lowerquery) || effName.lowercase()
-                .contains(lowerquery)) && startswith.isEmpty() -> contains.add(member)
+            )) && exact.isEmpty() -> wrongCase.add(member)
+            (name.lowercase().startsWith(lowerQuery) || effName.lowercase()
+                .startsWith(lowerQuery)) && wrongCase.isEmpty() -> startsWith.add(member)
+            (name.lowercase().contains(lowerQuery) || effName.lowercase()
+                .contains(lowerQuery)) && startsWith.isEmpty() -> contains.add(member)
         }
     }
     return when {
         exact.isNotEmpty() -> exact
-        wrongcase.isNotEmpty() -> wrongcase
-        else -> startswith.ifEmpty { contains }
+        wrongCase.isNotEmpty() -> wrongCase
+        else -> startsWith.ifEmpty { contains }
     }
 }
 
@@ -295,23 +296,23 @@ fun List<TextChannel>.findTextChannelsBlocking(query: String): List<TextChannel>
 
 fun List<TextChannel>.findTextChannels(query: String): List<TextChannel> {
     val exact = mutableListOf<TextChannel>()
-    val wrongcase = mutableListOf<TextChannel>()
-    val startswith = mutableListOf<TextChannel>()
+    val wrongCase = mutableListOf<TextChannel>()
+    val startsWith = mutableListOf<TextChannel>()
     val contains = mutableListOf<TextChannel>()
-    val lowerquery = query.lowercase()
+    val lowerQuery = query.lowercase()
     forEach { tc: TextChannel ->
         val name = tc.name
         when {
             name == query -> exact.add(tc)
-            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongcase.add(tc)
-            name.lowercase().startsWith(lowerquery) && wrongcase.isEmpty() -> startswith.add(tc)
-            name.lowercase().contains(lowerquery) && startswith.isEmpty() -> contains.add(tc)
+            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongCase.add(tc)
+            name.lowercase().startsWith(lowerQuery) && wrongCase.isEmpty() -> startsWith.add(tc)
+            name.lowercase().contains(lowerQuery) && startsWith.isEmpty() -> contains.add(tc)
         }
     }
     return when {
         exact.isNotEmpty() -> exact
-        wrongcase.isNotEmpty() -> wrongcase
-        else -> startswith.ifEmpty { contains }
+        wrongCase.isNotEmpty() -> wrongCase
+        else -> startsWith.ifEmpty { contains }
     }
 }
 
@@ -361,23 +362,23 @@ fun List<VoiceChannel>.findVoiceChannelsBlocking(query: String): List<VoiceChann
 
 fun List<VoiceChannel>.findVoiceChannels(query: String): List<VoiceChannel> {
     val exact = mutableListOf<VoiceChannel>()
-    val wrongcase = mutableListOf<VoiceChannel>()
-    val startswith = mutableListOf<VoiceChannel>()
+    val wrongCase = mutableListOf<VoiceChannel>()
+    val startsWith = mutableListOf<VoiceChannel>()
     val contains = mutableListOf<VoiceChannel>()
-    val lowerquery = query.lowercase()
+    val lowerQuery = query.lowercase()
     forEach { vc: VoiceChannel ->
         val name = vc.name
         when {
             name == query -> exact.add(vc)
-            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongcase.add(vc)
-            name.lowercase().startsWith(lowerquery) && wrongcase.isEmpty() -> startswith.add(vc)
-            name.lowercase().contains(lowerquery) && startswith.isEmpty() -> contains.add(vc)
+            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongCase.add(vc)
+            name.lowercase().startsWith(lowerQuery) && wrongCase.isEmpty() -> startsWith.add(vc)
+            name.lowercase().contains(lowerQuery) && startsWith.isEmpty() -> contains.add(vc)
         }
     }
     return when {
         exact.isNotEmpty() -> exact
-        wrongcase.isNotEmpty() -> wrongcase
-        else -> startswith.ifEmpty { contains }
+        wrongCase.isNotEmpty() -> wrongCase
+        else -> startsWith.ifEmpty { contains }
     }
 }
 
@@ -429,23 +430,23 @@ fun List<Category>.findCategories(
     query: String,
 ): List<Category> {
     val exact = mutableListOf<Category>()
-    val wrongcase = mutableListOf<Category>()
-    val startswith = mutableListOf<Category>()
+    val wrongCase = mutableListOf<Category>()
+    val startsWith = mutableListOf<Category>()
     val contains = mutableListOf<Category>()
-    val lowerquery = query.lowercase()
+    val lowerQuery = query.lowercase()
     forEach { cat: Category ->
         val name = cat.name
         when {
             name == query -> exact.add(cat)
-            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongcase.add(cat)
-            name.lowercase().startsWith(lowerquery) && wrongcase.isEmpty() -> startswith.add(cat)
-            name.lowercase().contains(lowerquery) && startswith.isEmpty() -> contains.add(cat)
+            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongCase.add(cat)
+            name.lowercase().startsWith(lowerQuery) && wrongCase.isEmpty() -> startsWith.add(cat)
+            name.lowercase().contains(lowerQuery) && startsWith.isEmpty() -> contains.add(cat)
         }
     }
     return when {
         exact.isNotEmpty() -> exact
-        wrongcase.isNotEmpty() -> wrongcase
-        else -> startswith.ifEmpty { contains }
+        wrongCase.isNotEmpty() -> wrongCase
+        else -> startsWith.ifEmpty { contains }
     }
 }
 
@@ -468,81 +469,76 @@ fun Guild.findRoles(query: String): List<Role> {
         if (role != null) return listOf(role)
     }
     val exact = mutableListOf<Role>()
-    val wrongcase = mutableListOf<Role>()
-    val startswith = mutableListOf<Role>()
+    val wrongCase = mutableListOf<Role>()
+    val startsWith = mutableListOf<Role>()
     val contains = mutableListOf<Role>()
-    val lowerquery = query.lowercase()
+    val lowerQuery = query.lowercase()
     roleCache.forEach { role: Role ->
         val name = role.name
         when {
             name == query -> exact.add(role)
-            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongcase.add(role)
-            name.lowercase().startsWith(lowerquery) && wrongcase.isEmpty() -> startswith.add(role)
-            name.lowercase().contains(lowerquery) && startswith.isEmpty() -> contains.add(role)
+            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongCase.add(role)
+            name.lowercase().startsWith(lowerQuery) && wrongCase.isEmpty() -> startsWith.add(role)
+            name.lowercase().contains(lowerQuery) && startsWith.isEmpty() -> contains.add(role)
         }
     }
     return when {
         exact.isNotEmpty() -> exact
-        wrongcase.isNotEmpty() -> wrongcase
-        else -> startswith.ifEmpty { contains }
+        wrongCase.isNotEmpty() -> wrongCase
+        else -> startsWith.ifEmpty { contains }
     }
 }
 
-fun Guild.findEmotesBlocking(query: String): List<Emote> {
-    val action = CompletableFuture.completedFuture(run {
-        runBlocking {
-            findEmotes(query)
-        }
-    })
-    return action.get()
+fun Guild.findEmojisBlocking(query: String): List<Emoji> = runBlocking {
+    findEmojis(query)
 }
 
-suspend fun Guild.findEmotes(query: String, useCache: Boolean = true): List<Emote> {
+suspend fun Guild.findEmojis(query: String, useCache: Boolean = true): List<Emoji> {
     val mentionMatcher = EMOTE_MENTION.matcher(query)
     when {
         DISCORD_ID.matcher(query).matches() -> {
-            val emote = getEmoteById(query)
-            if (emote != null) return listOf(emote)
+            val emoji = getEmojiById(query)
+            if (emoji != null) return listOf(emoji)
         }
         mentionMatcher.matches() -> {
             val emoteName = mentionMatcher.group(1)
             val emoteId = mentionMatcher.group(2)
-            val emote = getEmoteById(emoteId)
-            if (emote != null && emote.name == emoteName) return listOf(emote)
+            val emoji = getEmojiById(emoteId)
+            if (emoji != null && emoji.name == emoteName) return listOf(emoji)
         }
     }
-    return (if (useCache) emoteCache.asList() else retrieveEmotes().await()).findEmotes(query)
+    return (if (useCache) emojiCache.asList() else retrieveEmojis().await()).findEmojis(query)
 }
 
-fun JDA.findEmotesBlocking(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<Emote> {
+fun JDA.findEmojisBlocking(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<Emoji> {
     val action = CompletableFuture.completedFuture(run {
         runBlocking {
-            findEmotes(query, useShardManager, useCache)
+            findEmojis(query, useShardManager, useCache)
         }
     })
     return action.get()
 }
 
-suspend fun JDA.findEmotes(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<Emote> {
+suspend fun JDA.findEmojis(query: String, useShardManager: Boolean = false, useCache: Boolean = true): List<Emoji> {
     val mentionMatcher = EMOTE_MENTION.matcher(query)
     val manager = if (useShardManager) shardManager else null
     when {
         DISCORD_ID.matcher(query).matches() -> {
-            val emote = if (manager != null) manager.getEmoteById(query) else getEmoteById(query)
-            if (emote != null) return listOf(emote)
+            val emoji = if (manager != null) manager.getEmojiById(query) else getEmojiById(query)
+            if (emoji != null) return listOf(emoji)
         }
         mentionMatcher.matches() -> {
             val emoteName = mentionMatcher.group(1)
             val emoteId = mentionMatcher.group(2)
-            val emote = if (manager != null) manager.getEmoteById(emoteId) else getEmoteById(emoteId)
-            if (emote != null && emote.name == emoteName) return listOf(emote)
+            val emoji = if (manager != null) manager.getEmojiById(emoteId) else getEmojiById(emoteId)
+            if (emoji != null && emoji.name == emoteName) return listOf(emoji)
         }
     }
     return (if (useCache) {
-        emoteCache.asList()
+        emojiCache.asList()
     } else {
         guilds
-            .mapNotNull(Guild::retrieveEmotes)
+            .mapNotNull(Guild::retrieveEmojis)
             .mapNotNull {
                 try {
                     it.await()
@@ -552,40 +548,40 @@ suspend fun JDA.findEmotes(query: String, useShardManager: Boolean = false, useC
             }
             .flatten()
             .map {
-                it as Emote
+                it as Emoji
             }
-    }).findEmotes(query)
+    }).findEmojis(query)
 }
 
-fun List<Emote>.findEmotesBlocking(query: String): List<Emote> {
+fun List<Emoji>.findEmojisBlocking(query: String): List<Emoji> {
     val action = CompletableFuture.completedFuture(run {
         runBlocking {
-            findEmotes(query)
+            findEmojis(query)
         }
     })
     return action.get()
 }
 
-fun List<Emote>.findEmotes(
+fun List<Emoji>.findEmojis(
     query: String,
-): List<Emote> {
-    val exact = mutableListOf<Emote>()
-    val wrongcase = mutableListOf<Emote>()
-    val startswith = mutableListOf<Emote>()
-    val contains = mutableListOf<Emote>()
-    val lowerquery = query.lowercase()
-    forEach { emote: Emote ->
-        val name = emote.name
+): List<Emoji> {
+    val exact = mutableListOf<Emoji>()
+    val wrongCase = mutableListOf<Emoji>()
+    val startsWith = mutableListOf<Emoji>()
+    val contains = mutableListOf<Emoji>()
+    val lowerQuery = query.lowercase()
+    forEach { Emoji: Emoji ->
+        val name = Emoji.name
         when {
-            name == query -> exact.add(emote)
-            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongcase.add(emote)
-            name.lowercase().startsWith(lowerquery) && wrongcase.isEmpty() -> startswith.add(emote)
-            name.lowercase().contains(lowerquery) && startswith.isEmpty() -> contains.add(emote)
+            name == query -> exact.add(Emoji)
+            name.equals(query, ignoreCase = true) && exact.isEmpty() -> wrongCase.add(Emoji)
+            name.lowercase().startsWith(lowerQuery) && wrongCase.isEmpty() -> startsWith.add(Emoji)
+            name.lowercase().contains(lowerQuery) && startsWith.isEmpty() -> contains.add(Emoji)
         }
     }
     return when {
         exact.isNotEmpty() -> exact
-        wrongcase.isNotEmpty() -> wrongcase
-        else -> startswith.ifEmpty { contains }
+        wrongCase.isNotEmpty() -> wrongCase
+        else -> startsWith.ifEmpty { contains }
     }
 }

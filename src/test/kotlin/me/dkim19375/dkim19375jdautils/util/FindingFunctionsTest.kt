@@ -26,6 +26,7 @@ package me.dkim19375.dkim19375jdautils.util
 
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji
 import net.dv8tion.jda.api.requests.RestAction
 import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView
 import org.mockito.kotlin.mock
@@ -54,14 +55,14 @@ internal class FindingFunctionsTest {
     }
 
     @Test
-    fun `Test empty emotes functions cached`() {
-        val snowflakeCacheView = mock<SnowflakeCacheView<Emote>> {
-            on { asList() }.thenReturn(emptyList<Emote>())
+    fun `Test empty emojis functions cached`() {
+        val snowflakeCacheView = mock<SnowflakeCacheView<RichCustomEmoji>> {
+            on { asList() }.thenReturn(emptyList<RichCustomEmoji>())
         }
         val jda = mock<JDA> {
-            on { emoteCache }.thenReturn(snowflakeCacheView)
+            on { emojiCache }.thenReturn(snowflakeCacheView)
         }
-        assertTrue(jda.findEmotesBlocking(DUMMY).isEmpty())
+        assertTrue(jda.findEmojisBlocking(DUMMY).isEmpty())
     }
 
     @Test
@@ -135,25 +136,25 @@ internal class FindingFunctionsTest {
     }*/
 
     @Test
-    fun `Test empty emotes functions not cached`() {
-        val snowflakeCacheView = mock<SnowflakeCacheView<Emote>> {
-            on { asList() }.thenReturn(emptyList<Emote>())
+    fun `Test empty emojis functions not cached`() {
+        val snowflakeCacheView = mock<SnowflakeCacheView<RichCustomEmoji>> {
+            on { asList() }.thenReturn(emptyList<RichCustomEmoji>())
         }
-        val emote = mock<ListedEmote> {
+        val emoji = mock<RichCustomEmoji> {
             on { name }.thenReturn("slight_smile")
         }
-        val restAction = mock<RestAction<MutableList<ListedEmote>>> {
-            on { complete() }.thenReturn(mutableListOf(emote))
+        val restAction = mock<RestAction<MutableList<RichCustomEmoji>>> {
+            on { complete() }.thenReturn(mutableListOf(emoji))
         }
         val guild = mock<Guild> {
-            on { retrieveEmotes() }.thenReturn(restAction)
+            on { retrieveEmojis() }.thenReturn(restAction)
         }
         val jda = mock<JDA> {
             on { guilds }.thenReturn(mutableListOf(guild))
-            on { emoteCache }.thenReturn(snowflakeCacheView)
+            on { emojiCache }.thenReturn(snowflakeCacheView)
         }
 
-        assertTrue(jda.findEmotesBlocking(DUMMY, useCache = false).isEmpty())
+        assertTrue(jda.findEmojisBlocking(DUMMY, useCache = false).isEmpty())
     }
 
     // --------------- CACHED MUST NOT BE NULL ---------------
@@ -175,18 +176,18 @@ internal class FindingFunctionsTest {
     }
 
     @Test
-    fun `Test emotes functions cached`() {
-        val emote = mock<Emote> {
+    fun `Test emojis functions cached`() {
+        val emoji = mock<RichCustomEmoji> {
             on { name }.thenReturn("slight_smile")
         }
-        val snowflakeCacheView = mock<SnowflakeCacheView<Emote>> {
-            on { asList() }.thenReturn(listOf(emote))
+        val snowflakeCacheView = mock<SnowflakeCacheView<RichCustomEmoji>> {
+            on { asList() }.thenReturn(listOf(emoji))
         }
         val jda = mock<JDA> {
-            on { emoteCache }.thenReturn(snowflakeCacheView)
+            on { emojiCache }.thenReturn(snowflakeCacheView)
         }
 
-        assertEquals(jda.findEmotesBlocking("slight_smile").size, 1)
+        assertEquals(jda.findEmojisBlocking("slight_smile").size, 1)
     }
 
     @Test

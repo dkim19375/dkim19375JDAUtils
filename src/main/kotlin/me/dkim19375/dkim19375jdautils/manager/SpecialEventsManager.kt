@@ -138,7 +138,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     open fun onReactionAdd(
         permanent: Boolean,
         eventType: EventType,
-        action: suspend (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?, UUID) -> Boolean,
+        action: suspend (Event, Guild?, MessageReaction, MessageChannel, User, Message, Member?, UUID) -> Boolean,
         requiredMessage: Long = 0,
         requiredChannel: Long = 0,
         requiredGuild: Long = 0,
@@ -146,7 +146,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         removeIfNoPerms: Boolean = false,
         removeBotIfNoPerms: Boolean = false,
         removeSelfIfNoPerms: Boolean = false,
-        reaction: MessageReaction.ReactionEmote? = null,
+        reaction: MessageReaction? = null,
         retrieveMember: Boolean = true,
         debug: Boolean = false
     ): UUID {
@@ -189,7 +189,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     protected open suspend fun onReactionAddCoroutine(
         permanent: Boolean,
         eventType: EventType,
-        action: suspend (Event, Guild?, MessageReaction.ReactionEmote, MessageChannel, User, Message, Member?, UUID) -> Boolean,
+        action: suspend (Event, Guild?, MessageReaction, MessageChannel, User, Message, Member?, UUID) -> Boolean,
         requiredMessage: Long = 0,
         requiredChannel: Long = 0,
         requiredGuild: Long = 0,
@@ -197,7 +197,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         removeIfNoPerms: Boolean = false,
         removeBotIfNoPerms: Boolean = false,
         removeSelfIfNoPerms: Boolean = false,
-        reaction: MessageReaction.ReactionEmote? = null,
+        reaction: MessageReaction? = null,
         retrieveMember: Boolean = true,
         debug: Boolean = false,
         uuid: UUID,
@@ -221,9 +221,9 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             println("passed channel id test")
         }
         if (reaction != null) {
-            if (reaction.name != event.reactionEmote.name) {
+            if (reaction.emoji.asReactionCode != event.emoji.asReactionCode) {
                 if (debug) {
-                    println("stopped - reaction name: ${reaction.name}, emoji name: ${event.reactionEmote.name}")
+                    println("stopped - reaction: ${reaction.emoji.asReactionCode}")
                 }
                 return Pair(first = false, second = false)
             }
@@ -274,7 +274,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
         }
         if (whitelist.hasAccess(user, member, event.channel as? GuildChannel)) {
             runAction(true)
-            return true to !action(event, guild, event.reactionEmote, event.channel, user, msg, member, uuid)
+            return true to !action(event, guild, event.reaction, event.channel, user, msg, member, uuid)
         }
         if (debug) {
             println("no permissions")
@@ -291,10 +291,7 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
             runAction(false)
             return false to false
         }
-        when {
-            event.reactionEmote.isEmoji -> msg.removeReaction(event.reactionEmote.emoji, user).await()
-            event.reactionEmote.isEmote -> msg.removeReaction(event.reactionEmote.emote, user).await()
-        }
+        msg.removeReaction(event.reaction.emoji)
         runAction(false)
         return false to false
     }

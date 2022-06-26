@@ -9,14 +9,14 @@ plugins {
 }
 
 final KOTLIN_VER = '1.7.0'
-final JDA_VER = '5.0.0-alpha.12'
+// final JDA_VER = '5.0.0-alpha.12'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.10.2'
+version '2.10.3'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -48,7 +48,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly "net.dv8tion:JDA:$JDA_VER"
+    // compileOnly "net.dv8tion:JDA:$JDA_VER"
+    compileOnly 'com.github.Xirado:JDA:feature~permsv2-SNAPSHOT'
     compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 
     //noinspection GradlePackageUpdate
@@ -64,7 +65,8 @@ dependencies {
     api 'io.github.dkim19375:dkimcore:1.3.2'
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
-    testImplementation "net.dv8tion:JDA:$JDA_VER"
+    // testImplementation "net.dv8tion:JDA:$JDA_VER"
+    testImplementation 'com.github.Xirado:JDA:feature~permsv2-SNAPSHOT'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
     testImplementation 'com.github.minndevelopment:jda-ktx:0.7.0'
