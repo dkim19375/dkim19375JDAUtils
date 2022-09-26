@@ -38,7 +38,7 @@ import kotlin.test.assertTrue
 private const val USER_ID: Long = 123456789012345678L
 private const val SELF_USER_ID: Long = 234567890123456789L
 
-@Suppress("UNCHECKED_CAST")
+// @Suppress("UNCHECKED_CAST")
 // @RunWith(PowerMockRunner::class)
 // @PrepareForTest(User::class, Member::class, GuildChannel::class, SelfUser::class, Role::class)
 internal class WhitelistTest {

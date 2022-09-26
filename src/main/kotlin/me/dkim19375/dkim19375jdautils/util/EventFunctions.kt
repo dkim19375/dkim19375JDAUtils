@@ -25,8 +25,8 @@
 package me.dkim19375.dkim19375jdautils.util
 
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.GuildChannel
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel
 
 fun Member.hasPermission(permissions: Collection<Permission>, channel: GuildChannel? = null): Boolean {
     if (channel != null) {

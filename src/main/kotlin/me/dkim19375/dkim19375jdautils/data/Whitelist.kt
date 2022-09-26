@@ -26,14 +26,14 @@ package me.dkim19375.dkim19375jdautils.data
 
 import me.dkim19375.dkim19375jdautils.util.hasPermission
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.GuildChannel
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel
 
 /**
  * Whitelist
  *
- * By default it applies to all users
+ * By default, it applies to all users
  *
  * @property permissions Permissions required
  * @property whitelist If it is not null, then the user's id must be in the [Set<Long>][Set]

@@ -25,6 +25,9 @@
 package me.dkim19375.dkim19375jdautils.impl
 
 import com.neovisionaries.ws.client.WebSocketFactory
+import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.ScheduledExecutorService
 import net.dv8tion.jda.api.GatewayEncoding
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
@@ -39,34 +42,31 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.SessionController
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import okhttp3.OkHttpClient
-import java.util.concurrent.ConcurrentMap
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.ScheduledExecutorService
-import javax.annotation.CheckReturnValue
+import org.jetbrains.annotations.Contract
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class CustomJDABuilder(val creation: (Unit) -> JDABuilder) {
     val actions = mutableListOf<(JDABuilder) -> JDABuilder>()
 
     companion object {
-        @CheckReturnValue
+        @Contract(pure = true)
         fun createDefault(token: String): CustomJDABuilder = CustomJDABuilder { JDABuilder.createDefault(token) }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun createDefault(
             token: String,
             intent: GatewayIntent,
             vararg intents: GatewayIntent
         ): CustomJDABuilder = CustomJDABuilder { JDABuilder.createDefault(token, intent, *intents) }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun createDefault(token: String, intents: Collection<GatewayIntent>): CustomJDABuilder =
             CustomJDABuilder { JDABuilder.createDefault(token, intents) }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun createLight(token: String): CustomJDABuilder = CustomJDABuilder { JDABuilder.createLight(token) }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun createLight(
             token: String,
             intent: GatewayIntent,
@@ -75,23 +75,23 @@ class CustomJDABuilder(val creation: (Unit) -> JDABuilder) {
             JDABuilder.createLight(token, intent, *intents)
         }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun createLight(token: String, intents: Collection<GatewayIntent>): CustomJDABuilder =
             CustomJDABuilder { JDABuilder.createLight(token, intents) }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun create(intent: GatewayIntent, vararg intents: GatewayIntent): CustomJDABuilder =
             CustomJDABuilder { JDABuilder.create(intent, *intents) }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun create(intents: Collection<GatewayIntent>): CustomJDABuilder =
             CustomJDABuilder { JDABuilder.create(intents) }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun create(token: String?, intent: GatewayIntent, vararg intents: GatewayIntent): CustomJDABuilder =
             CustomJDABuilder { JDABuilder.create(token, intent, *intents) }
 
-        @CheckReturnValue
+        @Contract(pure = true)
         fun create(token: String?, intents: Collection<GatewayIntent>): CustomJDABuilder =
             CustomJDABuilder { JDABuilder.create(token, intents) }
     }

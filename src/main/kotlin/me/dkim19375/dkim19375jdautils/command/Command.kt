@@ -24,14 +24,17 @@
 
 package me.dkim19375.dkim19375jdautils.command
 
+import java.awt.Color
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkim19375jdautils.embed.EmbedUtils
 import me.dkim19375.dkim19375jdautils.embed.KotlinEmbedBuilder
 import me.dkim19375.dkimcore.annotation.API
-import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import java.awt.Color
 
 /**
  * The [Command] class - should be extended in every command class

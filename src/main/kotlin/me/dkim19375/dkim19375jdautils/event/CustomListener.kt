@@ -27,7 +27,12 @@ package me.dkim19375.dkim19375jdautils.event
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkimcore.annotation.API
 import me.dkim19375.dkimcore.extension.containsIgnoreCase
-import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 /**

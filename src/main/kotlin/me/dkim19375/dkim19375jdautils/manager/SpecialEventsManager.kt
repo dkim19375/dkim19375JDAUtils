@@ -25,6 +25,8 @@
 package me.dkim19375.dkim19375jdautils.manager
 
 import dev.minn.jda.ktx.await
+import java.util.UUID
+import kotlin.reflect.KClass
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.dkim19375.dkim19375jdautils.BotBase
@@ -36,12 +38,17 @@ import me.dkim19375.dkimcore.async.CoroutineConsumer
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.extension.getRandomUUID
 import me.dkim19375.dkimcore.extension.removeIf
-import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageReaction
+import net.dv8tion.jda.api.entities.SelfUser
+import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import java.util.*
-import kotlin.reflect.KClass
 
 /**
  * Special events manager
@@ -56,7 +63,8 @@ open class SpecialEventsManager(private val bot: BotBase) : ListenerAdapter() {
     val events = mutableMapOf<UUID, (MessageReactionAddEvent) -> CoroutineConsumer<Pair<Boolean, Boolean>>>()
 
     @API
-    val singleEvents = mutableMapOf<Type, MutableMap<UUID, (MessageReactionAddEvent) -> CoroutineConsumer<Pair<Boolean, Boolean>>>>()
+    val singleEvents =
+        mutableMapOf<Type, MutableMap<UUID, (MessageReactionAddEvent) -> CoroutineConsumer<Pair<Boolean, Boolean>>>>()
 
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
         SCOPE.launch { onEvent(Type.REACTION_ADD, event) }

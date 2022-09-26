@@ -16,7 +16,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.10.4'
+version '2.10.5'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -49,7 +49,7 @@ repositories {
 
 dependencies {
     // compileOnly "net.dv8tion:JDA:$JDA_VER"
-    compileOnly 'com.github.dkim19375:JDA:6713255963'
+    compileOnly 'com.github.dkim19375:JDA:6cd8810580'
     compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 
     //noinspection GradlePackageUpdate
@@ -66,7 +66,7 @@ dependencies {
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
-    testImplementation 'com.github.dkim19375:JDA:6713255963'
+    testImplementation 'com.github.dkim19375:JDA:6cd8810580'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
     testImplementation 'com.github.minndevelopment:jda-ktx:0.7.0'
