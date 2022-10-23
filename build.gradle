@@ -16,7 +16,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.10.6'
+version '2.10.7'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -49,7 +49,7 @@ repositories {
 
 dependencies {
     // compileOnly "net.dv8tion:JDA:$JDA_VER"
-    compileOnly 'com.github.dkim19375:JDA:6cd8810580'
+    compileOnly 'com.github.dkim19375:JDA:3c8cf71585'
     compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 
     //noinspection GradlePackageUpdate
