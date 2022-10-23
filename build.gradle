@@ -49,7 +49,7 @@ repositories {
 
 dependencies {
     // compileOnly "net.dv8tion:JDA:$JDA_VER"
-    compileOnly 'com.github.dkim19375:JDA:3c8cf71585'
+    compileOnly 'com.github.dkim19375:JDA:4.2.1'
     compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 
     //noinspection GradlePackageUpdate
