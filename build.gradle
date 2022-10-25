@@ -9,14 +9,13 @@ plugins {
 }
 
 final KOTLIN_VER = '1.7.20'
-// final JDA_VER = '5.0.0-alpha.12'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.10.7'
+version '2.10.8'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -48,8 +47,8 @@ repositories {
 }
 
 dependencies {
-    // compileOnly "net.dv8tion:JDA:$JDA_VER"
-    compileOnly 'com.github.dkim19375:JDA:3c8cf71585'
+    compileOnly "net.dv8tion:JDA:5.0.0-alpha.22"
+    // compileOnly 'com.github.dkim19375:JDA:3c8cf71585'
     compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 
     //noinspection GradlePackageUpdate
@@ -62,7 +61,7 @@ dependencies {
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4'
-    api 'io.github.dkim19375:dkimcore:1.3.4'
+    api 'io.github.dkim19375:dkimcore:1.4.0'
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
