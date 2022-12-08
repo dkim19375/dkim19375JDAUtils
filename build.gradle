@@ -47,7 +47,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "net.dv8tion:JDA:5.0.0-beta.1"
+    compileOnly "net.dv8tion:JDA:5.0.0-beta.2"
     // compileOnly 'com.github.dkim19375:JDA:3c8cf71585'
     compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 
