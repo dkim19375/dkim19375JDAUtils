@@ -15,7 +15,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.10.8'
+version '2.10.9'
 
 //noinspection GrUnresolvedAccess
 compileKotlin.kotlinOptions {
@@ -47,15 +47,14 @@ repositories {
 }
 
 dependencies {
-    compileOnly "net.dv8tion:JDA:5.0.0-beta.2"
-    // compileOnly 'com.github.dkim19375:JDA:3c8cf71585'
     compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 
     //noinspection GradlePackageUpdate
     api 'commons-io:commons-io:2.11.0'
+    api 'net.dv8tion:JDA:5.0.0-beta.2'
     api 'org.apache.commons:commons-lang3:3.12.0'
-    api 'com.github.minndevelopment:jda-ktx:0.7.0'
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
+    api 'com.github.minndevelopment:jda-ktx:0.10.0-beta.1'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER"
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
@@ -65,11 +64,11 @@ dependencies {
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
-    testImplementation 'com.github.dkim19375:JDA:6cd8810580'
+    testImplementation 'net.dv8tion:JDA:5.0.0-beta.2'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
-    testImplementation 'com.github.minndevelopment:jda-ktx:0.7.0'
     testImplementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
+    testImplementation 'com.github.minndevelopment:jda-ktx:0.10.0-beta.1'
 
     // testing libs
     testImplementation "org.jetbrains.kotlin:kotlin-test:$KOTLIN_VER"

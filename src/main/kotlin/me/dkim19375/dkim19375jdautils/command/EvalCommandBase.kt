@@ -24,7 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.command
 
-import dev.minn.jda.ktx.await
+import dev.minn.jda.ktx.coroutines.await
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkimcore.annotation.API
