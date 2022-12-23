@@ -24,7 +24,11 @@
 
 package me.dkim19375.dkim19375jdautils
 
-import dev.minn.jda.ktx.injectKTX
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import kotlin.concurrent.thread
+import kotlin.system.exitProcess
 import kotlinx.coroutines.launch
 import me.dkim19375.dkim19375jdautils.command.Command
 import me.dkim19375.dkim19375jdautils.command.CommandType
@@ -38,11 +42,6 @@ import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.file.YamlFile
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.requests.GatewayIntent
-import java.util.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import kotlin.concurrent.thread
-import kotlin.system.exitProcess
 
 /**
  * Bot base
@@ -63,18 +62,10 @@ abstract class BotBase {
     abstract val token: String
 
     /**
-     * Whether to Inject KTS from JDA-KTS
-     */
-    open val injectKTS = false
-
-    /**
      * The base JDA builder
      */
     open val baseJDABuilder: (Unit) -> CustomJDABuilder = builder@{
         val builder = CustomJDABuilder.createDefault(token)
-        if (injectKTS) {
-            builder.actions.add { it.injectKTX() }
-        }
         return@builder builder.enableIntents(intents)
             .addEventListeners(eventsManager, EventListener(this))
     }
