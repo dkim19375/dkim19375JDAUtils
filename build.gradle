@@ -51,7 +51,7 @@ dependencies {
 
     //noinspection GradlePackageUpdate
     api 'commons-io:commons-io:2.11.0'
-    api 'net.dv8tion:JDA:5.0.0-beta.6'
+    api 'net.dv8tion:JDA:5.0.0-beta.7'
     api 'org.apache.commons:commons-lang3:3.12.0'
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
     api 'com.github.minndevelopment:jda-ktx:0.10.0-beta.1'
@@ -64,7 +64,7 @@ dependencies {
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
-    testImplementation 'net.dv8tion:JDA:5.0.0-beta.6'
+    testImplementation 'net.dv8tion:JDA:5.0.0-beta.7'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
     testImplementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
