@@ -79,13 +79,10 @@ dependencies {
     testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
 }
 
-task sourcesJar(type: Jar) {
-    classifier 'sources'
-    from sourceSets.main.allSource
-}
-task javadocJar(type: Jar) {
-    from dokkaJavadoc
-    classifier 'javadoc'
+tasks.register('dokkaHtmlJar', Jar.class) {
+    dependsOn(dokkaHtml)
+    from(dokkaHtml)
+    archiveClassifier.set("javadoc")
 }
 
 publishing {
@@ -115,9 +112,9 @@ publishing {
             //noinspection GroovyAssignabilityCheck
             from components.kotlin
             //noinspection GroovyAssignabilityCheck
-            artifact sourcesJar
+            artifact kotlinSourcesJar
             //noinspection GroovyAssignabilityCheck
-            artifact javadocJar
+            artifact dokkaHtmlJar
 
             pom {
                 //noinspection GroovyAssignabilityCheck
