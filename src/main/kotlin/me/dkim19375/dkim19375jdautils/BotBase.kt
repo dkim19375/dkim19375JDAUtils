@@ -24,7 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils
 
-import java.util.*
+import java.util.Scanner
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.concurrent.thread
@@ -35,12 +35,12 @@ import me.dkim19375.dkim19375jdautils.command.CommandType
 import me.dkim19375.dkim19375jdautils.event.CustomListener
 import me.dkim19375.dkim19375jdautils.event.ErrorHandler
 import me.dkim19375.dkim19375jdautils.event.EventListener
-import me.dkim19375.dkim19375jdautils.impl.CustomJDABuilder
 import me.dkim19375.dkim19375jdautils.manager.SpecialEventsManager
 import me.dkim19375.dkimcore.annotation.API
 import me.dkim19375.dkimcore.extension.SCOPE
 import me.dkim19375.dkimcore.file.YamlFile
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.requests.GatewayIntent
 
 /**
@@ -64,8 +64,8 @@ abstract class BotBase {
     /**
      * The base JDA builder
      */
-    open val baseJDABuilder: (Unit) -> CustomJDABuilder = builder@{
-        val builder = CustomJDABuilder.createDefault(token)
+    open val baseJDABuilder: (Unit) -> JDABuilder = builder@{
+        val builder = JDABuilder.createDefault(token)
         return@builder builder.enableIntents(intents)
             .addEventListeners(eventsManager, EventListener(this))
     }
@@ -76,9 +76,9 @@ abstract class BotBase {
     open val errorHandler: ErrorHandler = ErrorHandler()
 
     /**
-     * Allows you to run methods on [CustomJDABuilder], overriding the ones ran by the [BotBase#onStart][BotBase.onStart]
+     * Allows you to run methods on [JDABuilder], overriding the ones ran by the [BotBase#onStart][BotBase.onStart]
      */
-    open val jdaBuilderActions: ((CustomJDABuilder) -> CustomJDABuilder)? = null
+    open val jdaBuilderActions: ((JDABuilder) -> JDABuilder)? = null
 
     /**
      * The listener to detect if a command is valid to send
@@ -170,7 +170,7 @@ abstract class BotBase {
         started = true
         println("Starting bot")
         val builder = jdaBuilderActions?.let { it(baseJDABuilder(Unit)) } ?: baseJDABuilder(Unit)
-        jda = builder.getBuilder().build()
+        jda = builder.build()
         Runtime.getRuntime().addShutdownHook(thread(false) {
             if (jda.status != JDA.Status.SHUTDOWN && jda.status != JDA.Status.SHUTTING_DOWN) {
                 println("Stopping the bot!")
