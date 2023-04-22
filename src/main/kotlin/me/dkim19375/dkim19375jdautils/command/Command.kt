@@ -43,6 +43,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
  * @constructor Creates a [Command] that should be in [BotBase.commands]
  */
 @API
+@Deprecated("Use slash commands instead")
 abstract class Command(private val bot: BotBase) {
     abstract val command: String
     abstract val name: String
@@ -52,6 +53,7 @@ abstract class Command(private val bot: BotBase) {
     abstract val type: CommandType
     abstract val minArgs: Int
     open val permissions: Whitelist = Whitelist()
+    @Suppress("DEPRECATION")
     open val helpEmbed: (
         user: User,
         guild: Guild?,
@@ -86,7 +88,7 @@ abstract class Command(private val bot: BotBase) {
     open fun sendHelpUsage(
         cmd: String,
         event: MessageReceivedEvent,
-        command: Command = this
+        @Suppress("DEPRECATION") command: Command = this
     ) {
         val guild = if (event.isFromGuild) event.guild else null
         if (!permissions.hasAccess(event.author, event.member, event.channel as? GuildChannel)) {
