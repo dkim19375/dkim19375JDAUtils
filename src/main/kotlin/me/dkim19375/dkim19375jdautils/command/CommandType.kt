@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+@file:Suppress("DEPRECATION")
+
 package me.dkim19375.dkim19375jdautils.command
 
 import me.dkim19375.dkim19375jdautils.BotBase
@@ -39,6 +41,7 @@ fun String.getCommandType(bot: BotBase): CommandType? {
     return null
 }
 
+@Deprecated("Use slash commands instead")
 abstract class CommandType(open val name: String, open val displayname: String = StringUtils.capitalize(name.lowercase())) {
     companion object {
         val UTILITIES: CommandType = object : CommandType("UTILITIES", "Utilities") {}

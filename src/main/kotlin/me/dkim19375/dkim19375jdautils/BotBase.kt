@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+@file:Suppress("DEPRECATION")
+
 package me.dkim19375.dkim19375jdautils
 
 import java.util.Scanner
@@ -99,11 +101,13 @@ abstract class BotBase {
     /**
      * [CommandTypes][me.dkim19375.dkim19375jdautils.command.CommandType] that should be registered
      */
+    @Deprecated("Use slash commands instead")
     open val commandTypes = mutableSetOf(CommandType.OTHER, CommandType.UTILITIES)
 
     /**
      * [Commands][Command] that should be registered
      */
+    @Deprecated("Use slash commands instead")
     open val commands = mutableSetOf<Command>()
 
     /**
@@ -136,12 +140,14 @@ abstract class BotBase {
      * @param guild The guild to get the prefix of
      * @return The prefix
      */
+    @Deprecated("Use slash commands instead")
     fun getPrefix(guild: Long?): String = getPrefix(guild?.toString())
 
     /**
      * @param guild The guild to get the prefix of
      * @return The prefix
      */
+    @Deprecated("Use slash commands instead")
     abstract fun getPrefix(guild: String?): String
 
     /**
@@ -149,6 +155,7 @@ abstract class BotBase {
      *
      * @return All [CommandTypes][CommandType] from [commands]
      */
+    @Deprecated("Use slash commands instead")
     open fun getAllCommandTypes(): Set<CommandType> {
         val types = commandTypes.toMutableSet()
         types.addAll(commands.map(Command::type))
@@ -216,5 +223,6 @@ abstract class BotBase {
      *
      * @param event the event of the command
      */
+    @Deprecated("Use slash commands instead")
     open fun sendEvent(event: (Command) -> Unit) = commands.forEach(event)
 }
