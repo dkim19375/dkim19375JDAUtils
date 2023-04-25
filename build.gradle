@@ -8,7 +8,7 @@ plugins {
     id 'io.github.gradle-nexus.publish-plugin' version '1.3.0'
 }
 
-final KOTLIN_VER = '1.8.20'
+final KOTLIN_VER = '1.8.21'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
