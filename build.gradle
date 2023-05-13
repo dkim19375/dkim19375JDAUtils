@@ -57,7 +57,7 @@ dependencies {
     api 'com.github.minndevelopment:jda-ktx:0.10.0-beta.1'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER"
     //noinspection GradlePackageUpdate
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1'
     api 'io.github.dkim19375:dkimcore:1.4.0'
