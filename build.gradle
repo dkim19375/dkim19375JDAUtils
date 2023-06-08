@@ -50,7 +50,7 @@ dependencies {
     compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
 
     //noinspection GradlePackageUpdate
-    api 'commons-io:commons-io:2.12.0'
+    api 'commons-io:commons-io:2.13.0'
     api 'net.dv8tion:JDA:5.0.0-beta.10'
     api 'org.apache.commons:commons-lang3:3.12.0'
     api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
@@ -65,7 +65,7 @@ dependencies {
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
     testImplementation 'net.dv8tion:JDA:5.0.0-beta.10'
-    testImplementation 'commons-io:commons-io:2.12.0'
+    testImplementation 'commons-io:commons-io:2.13.0'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
     testImplementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
     testImplementation 'com.github.minndevelopment:jda-ktx:0.10.0-beta.1'
