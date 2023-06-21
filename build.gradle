@@ -15,16 +15,14 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '2.10.9'
+version '2.10.10'
 
 //noinspection GrUnresolvedAccess
-compileKotlin.kotlinOptions {
-    languageVersion = "1.5"
+compileKotlin.compilerOptions {
     jvmTarget = '1.8'
 }
 
-compileTestKotlin.kotlinOptions {
-    languageVersion = "1.5"
+compileTestKotlin.compilerOptions {
     jvmTarget = '1.8'
 }
 
@@ -53,21 +51,19 @@ dependencies {
     api 'commons-io:commons-io:2.13.0'
     api 'net.dv8tion:JDA:5.0.0-beta.11'
     api 'org.apache.commons:commons-lang3:3.12.0'
-    api 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
     api 'com.github.minndevelopment:jda-ktx:0.10.0-beta.1'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER"
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1'
-    api 'io.github.dkim19375:dkimcore:1.4.0'
+    api 'io.github.dkim19375:dkimcore:1.4.1'
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
     testImplementation 'net.dv8tion:JDA:5.0.0-beta.11'
     testImplementation 'commons-io:commons-io:2.13.0'
     testImplementation 'org.apache.commons:commons-lang3:3.12.0'
-    testImplementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
     testImplementation 'com.github.minndevelopment:jda-ktx:0.10.0-beta.1'
 
     // testing libs
