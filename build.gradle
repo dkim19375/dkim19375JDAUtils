@@ -59,7 +59,7 @@ dependencies {
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1'
-    api 'io.github.dkim19375:dkimcore:1.4.1'
+    api 'io.github.dkim19375:dkimcore:1.4.2'
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
