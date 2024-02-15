@@ -58,7 +58,7 @@ dependencies {
     //noinspection GradlePackageUpdate
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0'
     //noinspection GradlePackageUpdate
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.0'
     api 'io.github.dkim19375:dkimcore:1.5.0'
     // api 'org.codehaus.groovy:groovy-jsr223:3.0.8'
 
