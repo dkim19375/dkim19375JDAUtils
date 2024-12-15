@@ -47,7 +47,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.openjdk.nashorn:nashorn-core:15.4'
+    compileOnly 'org.openjdk.nashorn:nashorn-core:15.5'
 
     //noinspection GradlePackageUpdate
     api 'commons-io:commons-io:2.18.0'
