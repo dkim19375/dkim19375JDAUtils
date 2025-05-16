@@ -22,8 +22,13 @@
  * SOFTWARE.
  */
 
+@file:Suppress("INLINE_FROM_HIGHER_PLATFORM")
+
 package me.dkim19375.dkim19375jdautils.data
 
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Member
@@ -31,9 +36,6 @@ import net.dv8tion.jda.api.entities.SelfUser
 import net.dv8tion.jda.api.entities.User
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.mock
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 private const val USER_ID: Long = 123456789012345678L
 private const val SELF_USER_ID: Long = 234567890123456789L
@@ -181,9 +183,27 @@ internal class WhitelistTest {
         val permissions = mutableSetOf(Permission.VIEW_CHANNEL)
 
         `when`(selfUser.jda).thenReturn(jda)
-        assertFalse(Whitelist(permissions, setOf(), ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST).hasAccess(user))
-        assertTrue(Whitelist(permissions, setOf(USER_ID), ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST).hasAccess(user))
-        assertTrue(Whitelist(permissions, setOf(), ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST).hasAccess(selfUser))
+        assertFalse(
+            Whitelist(
+                permissions,
+                setOf(),
+                ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST
+            ).hasAccess(user)
+        )
+        assertTrue(
+            Whitelist(
+                permissions,
+                setOf(USER_ID),
+                ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST
+            ).hasAccess(user)
+        )
+        assertTrue(
+            Whitelist(
+                permissions,
+                setOf(),
+                ignoreWhitelistBots = Whitelist.IgnoreType.IGNORE_WHITELIST
+            ).hasAccess(selfUser)
+        )
         assertFalse(Whitelist(permissions, setOf()).hasAccess(selfUser))
         assertTrue(Whitelist(permissions, setOf(SELF_USER_ID)).hasAccess(selfUser))
     }
