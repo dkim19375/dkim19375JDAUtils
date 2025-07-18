@@ -35,7 +35,7 @@ dependencies {
 
     api("commons-io:commons-io:2.19.0")
     api("net.dv8tion:JDA:5.6.1")
-    api("org.apache.commons:commons-lang3:3.17.0")
+    api("org.apache.commons:commons-lang3:3.18.0")
     api("com.github.minndevelopment:jda-ktx:0.12.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
@@ -46,7 +46,7 @@ dependencies {
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
     testImplementation("net.dv8tion:JDA:5.6.1")
     testImplementation("commons-io:commons-io:2.19.0")
-    testImplementation("org.apache.commons:commons-lang3:3.17.0")
+    testImplementation("org.apache.commons:commons-lang3:3.18.0")
     testImplementation("com.github.minndevelopment:jda-ktx:0.12.0")
 
     // testing libs
