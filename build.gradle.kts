@@ -34,7 +34,7 @@ dependencies {
     compileOnly("org.openjdk.nashorn:nashorn-core:15.6")
 
     api("commons-io:commons-io:2.19.0")
-    api("net.dv8tion:JDA:5.5.1")
+    api("net.dv8tion:JDA:5.6.1")
     api("org.apache.commons:commons-lang3:3.18.0")
     api("com.github.minndevelopment:jda-ktx:0.12.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER")
@@ -44,7 +44,7 @@ dependencies {
     // api("org.codehaus.groovy:groovy-jsr223:3.0.8")
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
-    testImplementation("net.dv8tion:JDA:5.5.1")
+    testImplementation("net.dv8tion:JDA:5.6.1")
     testImplementation("commons-io:commons-io:2.19.0")
     testImplementation("org.apache.commons:commons-lang3:3.18.0")
     testImplementation("com.github.minndevelopment:jda-ktx:0.12.0")
@@ -52,9 +52,9 @@ dependencies {
     // testing libs
     testImplementation("org.jetbrains.kotlin:kotlin-test:$KOTLIN_VER")
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.3")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 }
 
