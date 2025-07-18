@@ -40,7 +40,7 @@ dependencies {
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
-    api("io.github.dkim19375:dkimcore:1.5.0")
+    api("io.github.dkim19375:dkimcore:1.5.4")
     // api("org.codehaus.groovy:groovy-jsr223:3.0.8")
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
