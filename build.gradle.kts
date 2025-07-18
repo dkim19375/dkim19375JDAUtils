@@ -150,14 +150,14 @@ tasks {
     }
 
     withType<JavaCompile> {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
         options.encoding = "UTF-8"
     }
 
     withType<KotlinCompile> {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_1_8)
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 }
