@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.openjdk.nashorn:nashorn-core:15.6")
+    compileOnly("org.openjdk.nashorn:nashorn-core:15.7")
 
     api("commons-io:commons-io:2.20.0")
     api("net.dv8tion:JDA:5.6.1")
