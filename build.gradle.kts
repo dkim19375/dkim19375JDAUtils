@@ -7,11 +7,11 @@ plugins {
     `maven-publish`
     id("org.cadixdev.licenser") version "0.6.1"
     id("dev.adamko.dokkatoo-html") version "2.4.0"
-    id("org.jetbrains.kotlin.jvm") version "2.2.10"
+    id("org.jetbrains.kotlin.jvm") version "2.2.20"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
-val KOTLIN_VER = "2.2.10"
+val KOTLIN_VER = "2.2.20"
 
 group = "me.dkim19375"
 version = "2.10.11"
