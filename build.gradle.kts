@@ -33,7 +33,7 @@ repositories {
 dependencies {
     compileOnly("org.openjdk.nashorn:nashorn-core:15.7")
 
-    api("commons-io:commons-io:2.21.0")
+    api("commons-io:commons-io:20030203.000550")
     api("net.dv8tion:JDA:5.6.1")
     api("org.apache.commons:commons-lang3:3.19.0")
     api("com.github.minndevelopment:jda-ktx:0.12.0")
@@ -45,7 +45,7 @@ dependencies {
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
     testImplementation("net.dv8tion:JDA:5.6.1")
-    testImplementation("commons-io:commons-io:2.21.0")
+    testImplementation("commons-io:commons-io:20030203.000550")
     testImplementation("org.apache.commons:commons-lang3:3.19.0")
     testImplementation("com.github.minndevelopment:jda-ktx:0.12.0")
 
