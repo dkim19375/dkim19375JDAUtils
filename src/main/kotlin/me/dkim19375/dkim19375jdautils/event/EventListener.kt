@@ -45,15 +45,16 @@ class EventListener(private val bot: BotBase) : ListenerAdapter() {
                     return null
                 }
             }
+            val botPrefix = bot.getPrefix(serverId)
             prefix = when {
                 serverId == null -> removedMention
                 message.startsWith(replacedMention) -> replacedMention
                 message.startsWith(removedMention) -> removedMention
-                message.startsWith(bot.getPrefix(serverId), ignoreCase = true) -> bot.getPrefix(serverId)
+                botPrefix?.let { prefix -> message.startsWith(prefix, ignoreCase = true) } == true -> botPrefix
                 else -> return null
             }
         } else {
-            prefix = bot.getPrefix(typedNull<Long>())
+            prefix = bot.getPrefix(typedNull<Long>()) ?: return null
         }
         if (message.length <= prefix.length) {
             return null

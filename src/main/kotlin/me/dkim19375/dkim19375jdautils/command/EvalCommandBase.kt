@@ -24,7 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.command
 
-import dev.minn.jda.ktx.coroutines.await
+import dev.freya02.botcommands.jda.ktx.coroutines.await
 import me.dkim19375.dkim19375jdautils.BotBase
 import me.dkim19375.dkim19375jdautils.data.Whitelist
 import me.dkim19375.dkimcore.annotation.API
@@ -60,7 +60,6 @@ open class EvalCommandBase(protected val bot: BotBase) : Command(bot) {
             ?: NashornScriptEngineFactory::class.java).getDeclaredConstructor()
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun onCommand(
         cmd: String,
         args: List<String>,

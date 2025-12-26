@@ -141,14 +141,14 @@ abstract class BotBase {
      * @return The prefix
      */
     @Deprecated("Use slash commands instead")
-    fun getPrefix(guild: Long?): String = getPrefix(guild?.toString())
+    open fun getPrefix(guild: Long?): String? = getPrefix(guild?.toString())
 
     /**
      * @param guild The guild to get the prefix of
      * @return The prefix
      */
     @Deprecated("Use slash commands instead")
-    abstract fun getPrefix(guild: String?): String
+    open fun getPrefix(guild: String?): String? = null
 
     /**
      * Get all command types

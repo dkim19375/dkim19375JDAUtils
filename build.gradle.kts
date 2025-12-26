@@ -14,7 +14,7 @@ plugins {
 val KOTLIN_VER = "2.3.0"
 
 group = "me.dkim19375"
-version = "2.10.11"
+version = "2.10.12"
 
 license {
     header.set(rootProject.resources.text.fromFile("LICENSE"))
@@ -36,8 +36,8 @@ dependencies {
     api("commons-io:commons-io:2.21.0")
     api("net.dv8tion:JDA:6.2.0")
     api("org.apache.commons:commons-lang3:3.20.0")
-    api("com.github.minndevelopment:jda-ktx:0.12.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VER")
+    api("io.github.freya022:BotCommands-jda-ktx:3.0.0-beta.7")
+    api("org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VER")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
     api("io.github.dkim19375:dkimcore:1.6.3")
@@ -47,7 +47,7 @@ dependencies {
     testImplementation("net.dv8tion:JDA:6.2.0")
     testImplementation("commons-io:commons-io:2.21.0")
     testImplementation("org.apache.commons:commons-lang3:3.20.0")
-    testImplementation("com.github.minndevelopment:jda-ktx:0.12.0")
+    testImplementation("io.github.freya022:BotCommands-jda-ktx:3.0.0-beta.7")
 
     // testing libs
     testImplementation("org.jetbrains.kotlin:kotlin-test:$KOTLIN_VER")
@@ -150,14 +150,14 @@ tasks {
     }
 
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
         options.encoding = "UTF-8"
     }
 
     withType<KotlinCompile> {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 }

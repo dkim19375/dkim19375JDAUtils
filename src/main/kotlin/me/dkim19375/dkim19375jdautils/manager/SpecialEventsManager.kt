@@ -24,7 +24,7 @@
 
 package me.dkim19375.dkim19375jdautils.manager
 
-import dev.minn.jda.ktx.coroutines.await
+import dev.freya02.botcommands.jda.ktx.coroutines.await
 import java.util.UUID
 import kotlin.reflect.KClass
 import kotlinx.coroutines.launch
