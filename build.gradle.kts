@@ -34,7 +34,7 @@ dependencies {
     compileOnly("org.openjdk.nashorn:nashorn-core:15.7")
 
     api("commons-io:commons-io:2.21.0")
-    api("net.dv8tion:JDA:6.2.0")
+    api("net.dv8tion:JDA:6.3.0")
     api("org.apache.commons:commons-lang3:3.20.0")
     api("io.github.freya022:BotCommands-jda-ktx:3.0.0-beta.7")
     api("org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VER")
@@ -44,7 +44,7 @@ dependencies {
     // api("org.codehaus.groovy:groovy-jsr223:3.0.8")
 
     // testImplementation "net.dv8tion:JDA:$JDA_VER"
-    testImplementation("net.dv8tion:JDA:6.2.0")
+    testImplementation("net.dv8tion:JDA:6.3.0")
     testImplementation("commons-io:commons-io:2.21.0")
     testImplementation("org.apache.commons:commons-lang3:3.20.0")
     testImplementation("io.github.freya022:BotCommands-jda-ktx:3.0.0-beta.7")
