@@ -55,7 +55,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.14.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.14.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.14.1")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.1")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
