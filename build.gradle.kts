@@ -38,8 +38,8 @@ dependencies {
     api("org.apache.commons:commons-lang3:3.20.0")
     api("io.github.freya022:BotCommands-jda-ktx:3.0.0-beta.7")
     api("org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VER")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.11.0")
     api("io.github.dkim19375:dkimcore:1.6.3")
     // api("org.codehaus.groovy:groovy-jsr223:3.0.8")
 
